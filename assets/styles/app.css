@@ -1,3 +1,88 @@
-body {
-    background-color: skyblue;
+@import "tailwindcss";
+@plugin "@tailwindcss/forms";
+
+
+.sidebar-transition {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.kb-scroll-container::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+}
+.kb-scroll-container::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+.kb-scroll-container::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+.kb-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+.sortable-ghost {
+    opacity: 0.4;
+    background-color: #f3f4f6;
+    border: 2px dashed #cbd5e1;
+}
+
+.sortable-drag {
+    cursor: grabbing;
+}
+
+/* Multi-select styling helper */
+select[multiple] {
+    height: auto;
+    min-height: 120px;
+}
+
+/* .ts-hidden-accessible {
+    border: 0 !important;
+    clip: rect(0 0 0 0) !important;
+    -webkit-clip-path: inset(50%) !important;
+    clip-path: inset(50%) !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    position: absolute !important;
+    width: 1px !important;
+    white-space: nowrap !important;
+} */
+
+.ts-wrapper {
+    padding: 0 !important;
+}
+
+.ts-control {
+    border: none !important;
+    background: none !important;
+    box-shadow: none !important;
+}
+
+.ts-control > .item[data-ts-item] {
+    text-shadow: none !important;
+    box-shadow: none !important;
+    background: none !important;
+
+    position: relative !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    width: max-content !important;
+
+    color: var(--color-stone-800) !important;
+    border-color: var(--color-stone-800) !important;
+    border-radius: var(--radius-md) !important;
+
+    font-family: var(--font-sans) !important;
+    font-weight: var(--font-weight-medium) !important;
+    font-size: var(--text-sm) !important;
+    line-height: var(--text-sm--line-height) !important;
+    padding: calc(var(--spacing) * 0.5) !important;
 }

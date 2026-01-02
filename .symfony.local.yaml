@@ -1,0 +1,9 @@
+daemon: true
+
+http:
+    no_tls: true
+    use_gzip: false
+
+workers:
+    tailwind:
+        cmd: ['symfony', 'console', 'tailwind:build', '--watch']

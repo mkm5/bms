@@ -1,0 +1,125 @@
+{% extends 'base.html.twig' %}
+
+{% macro menu_group(name) %}
+    <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">{{ name }}</p>
+{% endmacro %}
+
+{% macro menu_item(name, is_active, icon, url) %}
+    {% set item_classes = is_active
+        ? "flex items-center gap-3 px-4 py-2 bg-gray-900 text-white rounded-lg group transition-all shadow-md"
+        : "flex items-center gap-3 px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-100 hover:text-black group transition-all"
+    %}
+    {% set icon_classes = is_active ? "text-xl text-white" : "text-xl text-gray-500 group-hover:text-black" %}
+
+    <a href="{{ url }}" class="{{ item_classes }}">
+        <twig:ux:icon name="{{ icon }}" class="{{ icon_classes }}" />
+        <span class="whitespace-nowrap font-medium">{{ name }}</span>
+    </a>
+{% endmacro %}
+
+{% block body %}
+    <div
+        data-controller="sidebar"
+        class="flex w-full h-full relative"
+    >
+        <div
+            data-sidebar-target="overlay"
+            data-action="click->sidebar#close"
+            class="fixed inset-0 bg-gray-900/50 z-30 hidden lg:hidden transition-opacity backdrop-blur-sm"
+        ></div>
+
+        <aside
+            data-sidebar-target="sidebar"
+            class="fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-200 flex flex-col sidebar-transition transform -translate-x-full lg:translate-x-0 lg:static shrink-0 h-full"
+        >
+            <div class="p-4 border-b border-gray-200 flex items-center gap-2">
+
+                {# User Menu #}
+                <div data-controller="dropdown" class="relative flex-1 min-w-0">
+                    <button
+                        data-action="click->dropdown#toggle"
+                        class="w-full flex items-center gap-2 p-1.5 -ml-1.5 rounded-lg hover:bg-gray-100 transition-colors text-left group focus:outline-none"
+                    >
+                        <img src="https://picsum.photos/seed/felix/200" alt="User" class="w-9 h-9 rounded-full border border-gray-300 object-cover shrink-0">
+                        <div class="flex-1 min-w-0 overflow-hidden">
+                            <p class="text-sm font-semibold text-gray-900 truncate">Alex Morgan</p>
+                        </div>
+                        <twig:ux:icon
+                            name="tabler:chevron-down"
+                            class="text-gray-400 transition-transform duration-200 text-xs"
+                            data-dropdown-target="chevron"
+                        />
+                    </button>
+
+                    {# Dropdown Menu #}
+                    <div
+                        data-dropdown-target="menu"
+                        class="absolute left-0 top-full mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-1 hidden opacity-0 scale-95 transform transition-all duration-200 z-50 origin-top-left"
+                    >
+                        <a href="#" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-black">
+                            <twig:ux:icon name="tabler:settings" class="text-gray-400" /> Settings
+                        </a>
+                        <a href="#" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-red-600">
+                            <twig:ux:icon name="tabler:logout" class="text-gray-400" /> Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {# Navigation Items #}
+            <nav class="flex-1 overflow-y-auto py-4 px-2 space-y-6 no-scrollbar">
+                {# Group: Project Management #}
+                <div>
+                    {{ _self.menu_group('Management') }}
+                    <ul class="space-y-1">
+                        <li>{{ _self.menu_item('Dashboard', false, 'tabler:layout-dashboard', '#') }}</li>
+                        <li>{{ _self.menu_item('Projects', false, 'tabler:briefcase', '#') }}</li>
+                        <li>{{ _self.menu_item('Tasks', true, 'tabler:checkbox', '#') }}</li>
+                    </ul>
+                </div>
+
+                {# Group: Contacts & CRM #}
+                <div>
+                    {{ _self.menu_group('CRM') }}
+                    <ul class="space-y-1">
+                        <li>{{ _self.menu_item('Companies', false, 'tabler:building-skyscraper', '#') }}</li>
+                        <li>{{ _self.menu_item('Contacts', false, 'tabler:users', '#') }}</li>
+                    </ul>
+                </div>
+
+                {# Group: Administration #}
+                <div>
+                    {{ _self.menu_group('Admin') }}
+                    <ul class="space-y-1">
+                        <li>{{ _self.menu_item('Roles', false, 'tabler:user-shield', '#') }}</li>
+                        <li>{{ _self.menu_item('Billing', false, 'tabler:report-money', '#') }}</li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+
+        <main class="flex-1 flex flex-col h-full overflow-hidden w-full relative">
+            <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-4 lg:px-8 shrink-0 z-10">
+                <div class="flex items-center gap-4">
+                    <button
+                        data-action="click->sidebar#toggle"
+                        class="lg:hidden p-2 -ml-2 text-gray-600 hover:text-black hover:bg-gray-100 rounded-lg transition-colors focus:outline-none"
+                    >
+                        <twig:ux:icon name="tabler:menu-2" class="text-xl" />
+                    </button>
+
+                    <h1 class="text-lg lg:text-xl font-bold text-gray-900 tracking-tight truncate">
+                        {%- block header_title -%}{%- endblock header_title -%}
+                    </h1>
+                </div>
+
+                {%- block header_extended -%}{%- endblock header_extended -%}
+            </header>
+
+            <div class="flex-1 overflow-y-auto p-4 lg:p-8">
+                {%- block content -%}{%- endblock content -%}
+            </div>
+        </main>
+    </div>
+{% endblock body %}
