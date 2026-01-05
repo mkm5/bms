@@ -1,0 +1,37 @@
+{%- set button_cva = html_cva(
+    base: 'inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50',
+    variants: {
+        variant: {
+            primary: 'bg-gray-900 text-gray-50 hover:bg-gray-900/90 shadow-sm',
+            secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-100/80',
+            outline: 'border border-gray-200 bg-white hover:bg-gray-100 hover:text-gray-900 text-gray-900',
+            ghost: 'hover:bg-gray-100 hover:text-gray-900 text-gray-700',
+            link: 'text-gray-900 underline-offset-4 hover:underline shadow-none',
+            danger: 'bg-red-600 text-white hover:bg-red-600/90 shadow-sm',
+        },
+        size: {
+            sm: 'h-8 px-3 text-xs',
+            md: 'h-9 px-4 py-2',
+            lg: 'h-10 px-8',
+            icon: 'h-9 w-9',
+        },
+        width: {
+            default: '',
+            full: 'w-full',
+        },
+    },
+    default_variant: {
+        variant: 'primary',
+        size: 'md',
+        width: 'default',
+    },
+) -%}
+
+{%- set element = (attributes.has('href')) ? 'a' : 'button' -%}
+<{{ element }}
+    {% if disabled %}disabled{% endif %}
+    class="{{ button_cva.apply({variant, size}, attributes.render('class'))|tailwind_merge }}"
+    {{ attributes }}
+>
+    {%- block content -%}{%- endblock -%}
+</{{ element }}>

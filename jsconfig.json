@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "module": "es6",
+    "target": "es6",
+    "paths": {
+      "@hotwired/stimulus": ["assets/vendor/@hotwired/stimulus/stimulus.index.js"],
+      "*": ["assets/vendor/*"]
+    }
+  },
+  "exclude": ["vendor", "var", "node_modules"]
+}

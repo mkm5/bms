@@ -1,0 +1,7 @@
+<div {{ attributes.defaults({class: 'relative flex py-6 items-center'}) }}>
+    <div class="grow border-t border-gray-200"></div>
+    {% if content %}
+    <span class="shrink-0 mx-4 text-xs font-medium text-gray-400 uppercase tracking-wider">{{- content|raw -}}</span>
+    <div class="grow border-t border-gray-200"></div>
+    {% endif %}
+</div>

@@ -1,0 +1,18 @@
+{%- set pill = html_cva(
+    base: 'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium border border-gray-200',
+    variants: {
+        variant: {
+            custom: '',
+            default: 'bg-gray-100 text-gray-800',
+            disabled: 'bg-white text-gray-400',
+        },
+    },
+    default_variant: {
+        variant: 'default',
+    },
+)-%}
+
+<span
+    class="{{ pill.apply({variant}, attributes.render('class'))|tailwind_merge }}"
+    {{ attributes }}
+>{{- content -}}</span>

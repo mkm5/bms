@@ -1,0 +1,28 @@
+<div
+    data-controller="modal"
+    data-modal-id-value="{{ name }}"
+    data-modal-open-value="{{ open }}"
+>
+    <div
+        class="fixed inset-0 hidden flex items-center justify-center p-4"
+        style="z-index: {{ zIndex }};"
+        data-modal-target="container"
+    >
+        <div {% if closeOnBackdropClick %}data-action="click->modal#close"{% endif %} class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+
+        <div
+            class="{{ ('relative bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden transform transition-all ' ~ attributes.render('class'))|tailwind_merge }}"
+            {{ attributes }}
+        >
+            <div class="p-6 space-y-4">
+                {%- if closeButton -%}
+                    <button data-action="click->modal#close" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 hover:cursor-pointer">
+                        <twig:ux:icon name="tabler:x" />
+                    </button>
+                {%- endif -%}
+
+                {%- block content -%}{%- endblock content -%}
+            </div>
+        </div>
+    </div>
+</div>
