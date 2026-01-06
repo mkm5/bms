@@ -1,0 +1,19 @@
+{% extends 'security/security_layout.html.twig' %}
+
+{% block title %}Login - Link Sent{% endblock %}
+
+{% block content %}
+    <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-gray-100 mb-6">
+        <twig:ux:icon name="tabler:mail" class="h-8 w-8 text-black" />
+    </div>
+
+    <h1 class="text-2xl font-bold tracking-tight mb-2">Check your email</h1>
+    <p class="text-gray-500 mb-8">
+        We've sent a magic link to <span class="font-medium text-gray-900">{{ email }}</span>.<br>
+        Click the link in the email to sign in.
+    </p>
+
+    <div class="space-y-4">
+        <twig:Elements:Button href="{{ path('app_user_login') }}">Back to Log in</twig:Elements:Button>
+    </div>
+{% endblock %}

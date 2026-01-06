@@ -19,7 +19,7 @@
 
 {% block body %}
     <div
-        data-controller="sidebar"
+        data-controller="sidebar event-caller"
         class="flex w-full h-full relative"
     >
         <div
@@ -54,12 +54,12 @@
                     {# Dropdown Menu #}
                     <div
                         data-dropdown-target="menu"
-                        class="absolute left-0 top-full mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-1 hidden opacity-0 scale-95 transform transition-all duration-200 z-50 origin-top-left"
+                        class="absolute left-0 top-full mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-1 hidden transform transition-all duration-200 z-50 origin-top-left"
                     >
-                        <a href="#" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-black">
+                        {#<a href="#" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-black">
                             <twig:ux:icon name="tabler:settings" class="text-gray-400" /> Settings
-                        </a>
-                        <a href="#" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-red-600">
+                        </a>#}
+                        <a href="{{ path('app_user_logout') }}" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-red-600">
                             <twig:ux:icon name="tabler:logout" class="text-gray-400" /> Logout
                         </a>
                     </div>
@@ -67,6 +67,7 @@
             </div>
 
             {# Navigation Items #}
+            {%- set current_route = app.request.attributes.get('_route') -%}
             <nav class="flex-1 overflow-y-auto py-4 px-2 space-y-6 no-scrollbar">
                 {# Group: Project Management #}
                 <div>
@@ -74,7 +75,7 @@
                     <ul class="space-y-1">
                         <li>{{ _self.menu_item('Dashboard', false, 'tabler:layout-dashboard', '#') }}</li>
                         <li>{{ _self.menu_item('Projects', false, 'tabler:briefcase', '#') }}</li>
-                        <li>{{ _self.menu_item('Tasks', true, 'tabler:checkbox', '#') }}</li>
+                        <li>{{ _self.menu_item('Tasks', false, 'tabler:checkbox', '#') }}</li>
                     </ul>
                 </div>
 
@@ -83,7 +84,7 @@
                     {{ _self.menu_group('CRM') }}
                     <ul class="space-y-1">
                         <li>{{ _self.menu_item('Companies', false, 'tabler:building-skyscraper', '#') }}</li>
-                        <li>{{ _self.menu_item('Contacts', false, 'tabler:users', '#') }}</li>
+                        <li>{{ _self.menu_item('Contacts', false, 'tabler:user-share', '#') }}</li>
                     </ul>
                 </div>
 
@@ -91,8 +92,7 @@
                 <div>
                     {{ _self.menu_group('Admin') }}
                     <ul class="space-y-1">
-                        <li>{{ _self.menu_item('Roles', false, 'tabler:user-shield', '#') }}</li>
-                        <li>{{ _self.menu_item('Billing', false, 'tabler:report-money', '#') }}</li>
+                        <li>{{ _self.menu_item('Users', current_route == 'app_admin_users', 'tabler:users', path('app_admin_users')) }}</li>
                     </ul>
                 </div>
             </nav>

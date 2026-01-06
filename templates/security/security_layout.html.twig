@@ -1,0 +1,9 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<main class="min-h-screen w-full flex items-center justify-center p-4 overflow-auto">
+    <div class="w-full max-w-md bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+        <div class="p-4 md:p-8">{% block content %}{% endblock content %}</div>
+    </div>
+</main>
+{% endblock body %}

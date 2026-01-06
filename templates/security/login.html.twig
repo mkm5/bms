@@ -1,0 +1,61 @@
+{% extends 'security/security_layout.html.twig' %}
+{% import 'elements.html.twig' as c %}
+
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+    <form name="user_login" method="post" class="space-y-4">
+        {% if error %}
+            <div role="alert" class="relative flex items-start w-full border rounded-md p-2 bg-red-500 border-red-500 text-red-50">
+                <div class="w-full text-sm font-sans leading-none m-1.5">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            </div>
+        {% endif %}
+
+        <div>
+            <label class="{{ c._label() }}" for="username">Email</label>
+            <input
+                type="email"
+                autocomplete="email"
+                required="required"
+                placeholder="name@example.com"
+                id="username"
+                name="_username"
+                class="{{ c._input('w-full') }}"
+                value="{{ last_username }}"
+            >
+        </div>
+        <div>
+            <label class="{{ c._label() }}" for="password">Password</label>
+            <input
+                type="password"
+                autocomplete="current-password"
+                required="required"
+                placeholder="••••••••"
+                id="password"
+                name="_password"
+                class="{{ c._input('w-full') }}"
+            >
+        </div>
+
+        <input
+            data-controller="csrf-protection"
+            type="hidden"
+            name="_csrf_token"
+            value="{{ csrf_token('authenticate') }}"
+        >
+        <twig:Elements:Button type="submit" width="full">Sign In</twig:Elements:Button>
+    </form>
+
+    <twig:Elements:Divider content="OR"/>
+
+    {{ form_start(user_magic_link_request_form) }}
+        <div class="text-center mb-3">
+            <h2 class="text-sm font-semibold text-gray-900">Login via Email</h2>
+        </div>
+
+        {{ form_rest(user_magic_link_request_form) }}
+
+        <twig:Elements:Button type="submit" variant="outline" width="full" >Send Link</twig:Elements:Button>
+    {{ form_end(user_magic_link_request_form) }}
+{% endblock %}

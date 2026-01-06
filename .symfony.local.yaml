@@ -7,3 +7,9 @@ http:
 workers:
     tailwind:
         cmd: ['symfony', 'console', 'tailwind:build', '--watch']
+
+    # messenger_consume_async:
+    #     cmd: ['symfony', 'console', 'messenger:consume', 'async']
+    #     watch: ['config', 'src', 'templates', 'vendor/composer/installed.json']
+
+    # docker_compose: ~

@@ -1,0 +1,43 @@
+{% extends 'security/security_layout.html.twig' %}
+
+{% block title %}Registration finalization{% endblock %}
+
+{% block content %}
+    <div class="text-center">
+        <h1 class="text-2xl font-bold tracking-tight">Activate Account</h1>
+        <p class="text-sm text-gray-500 mt-2">Please set a password to complete your profile</p>
+    </div>
+
+    <div class="bg-gray-50 rounded-lg p-5 mb-6 border border-gray-200">
+        <div class="flex items-start gap-4">
+            <div class="grow space-y-3">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <span class="block text-xs font-medium text-gray-400 uppercase tracking-wide">First Name</span>
+                        <span class="block text-sm font-medium text-gray-900">{{ user.firstName|default('-') }}</span>
+                    </div>
+                    <div>
+                        <span class="block text-xs font-medium text-gray-400 uppercase tracking-wide">Last Name</span>
+                        <span class="block text-sm font-medium text-gray-900">{{ user.lastName|default('-') }}</span>
+                    </div>
+                </div>
+
+                <div>
+                    <span class="block text-xs font-medium text-gray-400 uppercase tracking-wide">Position</span>
+                    <span class="block text-sm font-medium text-gray-900">{{ user.position|default('-') }}</span>
+                </div>
+
+                <div>
+                    <span class="block text-xs font-medium text-gray-400 uppercase tracking-wide">Email</span>
+                    <span class="block text-sm font-medium text-gray-900">{{ user.email }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{ form_start(form) }}
+        {{ form_rest(form) }}
+
+        <twig:Elements:Button type="submit" width="full">Complete Registration</twig:Elements:Button>
+    {{ form_end(form) }}
+{% endblock %}
