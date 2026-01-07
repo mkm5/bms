@@ -5,6 +5,8 @@ namespace App\Twig\Components\Admin;
 use App\Entity\User;
 use App\Form\UserCreationType;
 use App\Repository\UserRepository;
+use App\Service\Paginator;
+use App\Service\PaginatorTrait;
 use App\Service\User\RegistrationNotifier;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -26,6 +28,7 @@ final class UsersListing extends AbstractController
     use ComponentToolsTrait;
     use DefaultActionTrait;
     use ComponentWithFormTrait;
+    use PaginatorTrait;
 
     #[LiveProp(writable: true, url: new UrlMapping(as: 'q'))]
     public ?string $search = null;
@@ -41,7 +44,7 @@ final class UsersListing extends AbstractController
 
     private const PER_PAGE = 20;
 
-    private ?int $_totalUsers = null;
+    private ?Paginator $paginator = null;
 
     #[LiveProp]
     public ?User $viewUser = null;
@@ -87,6 +90,7 @@ final class UsersListing extends AbstractController
         }
 
         $this->viewUser = null;
+        $this->resetForm();
         $this->dispatchBrowserEvent('modal:close', ['id' => self::MODAL_NAME]);
     }
 
@@ -116,118 +120,61 @@ final class UsersListing extends AbstractController
         $this->em->flush();
     }
 
+    private function countUsers(): int
+    {
+        return $this->userRepository->countSearch(
+            search: $this->search,
+            onlyActive: $this->onlyActiveUsers,
+            onlyAdmins: $this->onlyAdmins,
+        );
+    }
+
+    /**
+     * @var Users[]
+     */
+    private function fetchUsers(int $limit, int $offset): array
+    {
+        return $this->userRepository->search(
+            search: $this->search,
+            onlyActive: $this->onlyActiveUsers,
+            onlyAdmins: $this->onlyAdmins,
+            limit: $limit,
+            offset: $offset,
+        );
+    }
+
+    /**
+     * @return Paginator<User>
+     */
+    protected function getPaginator(): Paginator
+    {
+        if ($this->paginator === null) {
+            $this->paginator = new Paginator(
+                currentPage: $this->page,
+                itemsPerPage: self::PER_PAGE,
+                countCallback: $this->countUsers(...),
+                fetchCallback: $this->fetchUsers(...),
+            );
+        }
+
+        return $this->paginator;
+    }
+
     /**
      * @return User[]
      */
     public function getUsers(): array
     {
-        $offset = ($this->page - 1) * self::PER_PAGE;
-
-        return $this->userRepository->search(
-            search: $this->search,
-            onlyActive: $this->onlyActiveUsers,
-            onlyAdmins: $this->onlyAdmins,
-            limit: self::PER_PAGE,
-            offset: $offset
-        );
+        return $this->getItems();
     }
 
     public function getTotalUsers(): int
     {
-        if ($this->_totalUsers === null) {
-            $this->_totalUsers = $this->userRepository->countSearch(
-                search: $this->search,
-                onlyActive: $this->onlyActiveUsers,
-                onlyAdmins: $this->onlyAdmins,
-            );
-        }
-
-        return $this->_totalUsers;
-    }
-
-    public function getTotalPages(): int
-    {
-        return (int) ceil($this->getTotalUsers() / self::PER_PAGE);
-    }
-
-    public function hasPreviousPage(): bool
-    {
-        return $this->page > 1;
-    }
-
-    public function hasNextPage(): bool
-    {
-        return $this->page < $this->getTotalPages();
-    }
-
-    public function getFirstItemNumber(): int
-    {
-        if ($this->getTotalUsers() === 0) {
-            return 0;
-        }
-
-        return ($this->page - 1) * self::PER_PAGE + 1;
-    }
-
-    public function getLastItemNumber(): int
-    {
-        return min($this->page * self::PER_PAGE, $this->getTotalUsers());
+        return $this->getTotalItems();
     }
 
     public static function getModalName(): string
     {
         return self::MODAL_NAME;
-    }
-
-    /**
-     * @return array<int|string>
-     */
-    public function getPageNumbers(int $maxPages = 5): array
-    {
-        $totalPages = $this->getTotalPages();
-        $currentPage = $this->page;
-
-        if ($totalPages <= 1) {
-            return [];
-        }
-
-        if ($totalPages <= $maxPages) {
-            return range(1, $totalPages);
-        }
-
-        // Calculate how many pages we can show in the middle (excluding first and last page)
-        $middleSlots = $maxPages - 2;
-        $sidePages = (int) floor($middleSlots / 2);
-
-        $rangeStart = max(2, $currentPage - $sidePages);
-        $rangeEnd = min($totalPages - 1, $currentPage + $sidePages);
-
-        // Adjusting range for start
-        if ($currentPage <= $sidePages + 1) {
-            $rangeStart = 2;
-            $rangeEnd = min($middleSlots + 1, $totalPages - 1);
-        }
-
-        // Adjusting range for end
-        if ($currentPage >= $totalPages - $sidePages) {
-            $rangeStart = max(2, $totalPages - $middleSlots);
-            $rangeEnd = $totalPages - 1;
-        }
-
-        $pages = [];
-
-        if ($rangeStart > 2) {
-            $pages[] = null;
-        }
-
-        for ($i = $rangeStart; $i <= $rangeEnd; $i++) {
-            $pages[] = $i;
-        }
-
-        if ($rangeEnd < $totalPages - 1) {
-            $pages[] = null;
-        }
-
-        return [1, ...$pages, $totalPages];
     }
 }
