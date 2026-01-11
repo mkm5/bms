@@ -1,0 +1,75 @@
+<div {{ attributes }}>
+    <div class="max-w-4xl space-y-6">
+        <div class="flex items-center gap-2 text-sm text-gray-500">
+            <a href="{{ path('app_user_projects') }}" class="hover:text-gray-900 hover:underline">Projects</a>
+            <twig:ux:icon name="tabler:chevron-right" class="w-4 h-4" />
+            <span class="text-gray-900">{{ project.name }}</span>
+        </div>
+
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-gray-900">Project Details</h2>
+                <twig:Elements:Button
+                    data-action="live#action"
+                    data-live-action-param="editProject"
+                >
+                    <twig:ux:icon name="tabler:pencil" class="mr-2" />Edit
+                </twig:Elements:Button>
+            </div>
+            <div class="p-6 space-y-6">
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500 mb-1">Name</h3>
+                    <p class="text-gray-900">{{ project.name }}</p>
+                </div>
+
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500 mb-1">Description</h3>
+                    <p class="text-gray-900 whitespace-pre-wrap">{{ project.description|default('No description provided.') }}</p>
+                </div>
+
+                <div>
+                    <div class="flex gap-4">
+                        <h3 class="inline-block text-sm font-medium text-gray-500 mb-1">Status</h3>
+                        <button
+                            type="button"
+                            data-action="live#action"
+                            data-live-action-param="toggleProjectStatus"
+                            class="inline-flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 hover:cursor-pointer"
+                        >
+                            {% if project.isFinished %}
+                                <twig:ux:icon name="tabler:player-play" class="w-4 h-4" /> Mark as active
+                            {% else %}
+                                <twig:ux:icon name="tabler:check" class="w-4 h-4" /> Mark as finished
+                            {% endif %}
+                        </button>
+                    </div>
+                    <div>
+                        <twig:Elements:Pill
+                            variant="{{ project.isFinished ? 'disabled' : 'default' }}"
+                            content="{{ project.isFinished ? 'Finished' : 'Active' }}"
+                        />
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500 mb-2">Managers</h3>
+                    {% if project.managers|length > 0 %}
+                        <div class="flex flex-wrap gap-2">
+                            {% for manager in project.managers %}
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                                    {{ manager.displayName }}
+                                </span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-gray-500">No managers assigned.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <twig:Elements:Modal name="{{ this.modalName }}">
+        <twig:User:ProjectEdit />
+    </twig:Elements:Modal>
+</div>

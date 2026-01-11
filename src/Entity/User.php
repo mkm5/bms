@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -49,6 +51,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column]
     private bool $isActive = false;
+
+    /**
+     * @var Collection<int, Project>
+     */
+    #[ORM\ManyToMany(targetEntity: Project::class, mappedBy: 'managers')]
+    private Collection $managedProjects;
+
+    public function __construct()
+    {
+        $this->managedProjects = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -178,6 +191,39 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIsActive(bool $isActive): self
     {
         $this->isActive = $isActive;
+        return $this;
+    }
+
+    public function getDisplayName(): string
+    {
+        $fn = $this->getFirstName() ?? '';
+        $ln = $this->getLastName() ?? '';
+        return trim($fn . ' ' . $ln . ' (' . $this->email . ')');
+    }
+
+    /**
+     * @return Collection<int, Project>
+     */
+    public function getManagedProjects(): Collection
+    {
+        return $this->managedProjects;
+    }
+
+    public function addManagedProject(Project $project): static
+    {
+        if (!$this->managedProjects->contains($project)) {
+            $this->managedProjects->add($project);
+            $project->addManager($this);
+        }
+
+        return $this;
+    }
+
+    public function removeManagedProject(Project $project): static
+    {
+        if ($this->managedProjects->removeElement($project)) {
+            $project->removeManager($this);
+        }
         return $this;
     }
 }

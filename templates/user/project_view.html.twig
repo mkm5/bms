@@ -1,0 +1,11 @@
+{% extends 'default_layout.html.twig' %}
+
+{% block title %}{{ project.name }} - Projects{% endblock %}
+
+{% block header_title %}Projects - {{ project.name }}{% endblock %}
+
+{% block header_extended %}{% endblock %}
+
+{% block content %}
+    <twig:User:ProjectView :project="project" />
+{% endblock %}

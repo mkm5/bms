@@ -1,0 +1,15 @@
+<div {{ attributes.defaults({'data-controller': 'autocomplete-select-extend'}) }}>
+    <h2 class="text-xl font-semibold text-gray-900 mb-4">
+        {{ viewProject is not null and viewProject.id is not empty ? 'Edit Project' : 'New Project' }}
+    </h2>
+
+    {{ form_start(form, {
+        attr: {
+            'data-action': 'live#action:prevent',
+            'data-live-action-param': 'save'
+        }
+    }) }}
+        {{ form_rest(form) }}
+        <twig:Elements:Button type="submit" class="mt-4">Save</twig:Elements:Button>
+    {{ form_end(form) }}
+</div>

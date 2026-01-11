@@ -74,7 +74,7 @@
                     {{ _self.menu_group('Management') }}
                     <ul class="space-y-1">
                         <li>{{ _self.menu_item('Dashboard', false, 'tabler:layout-dashboard', '#') }}</li>
-                        <li>{{ _self.menu_item('Projects', false, 'tabler:briefcase', '#') }}</li>
+                        <li>{{ _self.menu_item('Projects', current_route == 'app_user_projects', 'tabler:briefcase', path('app_user_projects')) }}</li>
                         <li>{{ _self.menu_item('Tasks', false, 'tabler:checkbox', '#') }}</li>
                     </ul>
                 </div>
