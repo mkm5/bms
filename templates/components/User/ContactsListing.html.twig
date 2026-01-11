@@ -1,0 +1,144 @@
+{% import "elements.html.twig" as c %}
+
+<div
+    class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"
+    {{ attributes }}
+>
+    <div class="px-6 py-4 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex gap-2">
+            <input
+                class="{{ c._input('w-64') }}"
+                type="text"
+                data-model="debounce(150)|search"
+                placeholder="Search..."
+            >
+        </div>
+        <twig:Elements:Button
+            data-action="live#action"
+            data-live-action-param="editContact"
+        >
+            <twig:ux:icon name="tabler:user-plus" class="mr-2" />New Contact
+        </twig:Elements:Button>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left text-gray-500">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b border-gray-200">
+                <tr>
+                    <th class="px-6 py-3 font-medium whitespace-nowrap">Name</th>
+                    <th class="px-6 py-3 font-medium whitespace-nowrap">Company</th>
+                    <th class="px-6 py-3 font-medium whitespace-nowrap">Email</th>
+                    <th class="px-6 py-3 font-medium whitespace-nowrap">Phone</th>
+                    <th class="px-6 py-3 font-medium text-right whitespace-nowrap w-8">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {%- for contact in this.contacts -%}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 font-medium text-gray-900">
+                        <twig:Elements:Button variant="link" href="{{ path('app_user_contact_view', {id: contact.id}) }}">
+                            {{ contact.firstName }} {{ contact.lastName }}
+                        </twig:Elements:Button>
+                    </td>
+                    <td class="px-6 py-4 text-gray-500">
+                        {% if contact.company %}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                {{- contact.company.name -}}
+                            </span>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4 text-gray-500">
+                        {% set email = null %}
+                        {% for channel in contact.communcationChannels %}
+                            {% if channel.type.value == 'email' and email is null %}
+                                {% set email = channel.value %}
+                            {% endif %}
+                        {% endfor %}
+                        {{ email|default('-') }}
+                    </td>
+                    <td class="px-6 py-4 text-gray-500">
+                        {% set phone = null %}
+                        {% for channel in contact.communcationChannels %}
+                            {% if channel.type.value starts with 'phone_' and phone is null %}
+                                {% set phone = channel.value %}
+                            {% endif %}
+                        {% endfor %}
+                        {{ phone|default('-') }}
+                    </td>
+                    <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap text-right">
+                        <div class="inline-flex items-center gap-2">
+                            <div class="relative inline-block text-left" data-controller="dropdown">
+                                <button
+                                    type="button"
+                                    data-action="click->dropdown#toggle"
+                                    class="inline-flex items-center justify-center w-8 h-8 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                >
+                                    <twig:ux:icon name="tabler:menu-2" class="w-5 h-5" />
+                                </button>
+
+                                <div
+                                    class="hidden fixed translate-x-[-150px] right-auto z-50 mt-1 w-52 origin-top-left bg-white rounded-md shadow-xl ring-1 ring-black/5"
+                                    data-dropdown-target="menu"
+                                >
+                                    <div class="py-1">
+                                        <button
+                                            type="button"
+                                            data-action="live#action"
+                                            data-live-action-param="editContact"
+                                            data-live-contact-id-param="{{ contact.id }}"
+                                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                                        >
+                                            <twig:ux:icon name="tabler:pencil" class="w-4 h-4" /> Edit
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {%- endfor -%}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="flex my-2 mx-4 justify-between items-center">
+        <twig:Elements:Button
+            variant="link"
+            size="lg"
+            data-action="live#update"
+            data-model="page"
+            data-value="{{ this.page - 1}}"
+            disabled="{{ not this.hasPreviousPage }}"
+        >Previous</twig:Elements:Button>
+
+        <div class="flex gap-1 items-center">
+            {% for pageNum in this.pageNumbers %}
+                {% if pageNum == '...' %}
+                    <span class="px-3 py-1 text-gray-400 select-none">...</span>
+                {% else %}
+                    <twig:Elements:Button
+                        data-action="live#update"
+                        data-model="page"
+                        data-value="{{ pageNum }}"
+                        variant="{{ pageNum == this.page ? 'primary' : 'link' }}"
+                        disabled="{{ pageNum == this.page }}"
+                    >{{ pageNum }}</twig:Elements:Button>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <twig:Elements:Button
+            variant="link"
+            size="lg"
+            data-action="live#update"
+            data-model="page"
+            data-value="{{ this.page + 1}}"
+            disabled="{{ not this.hasNextPage }}"
+        >Next</twig:Elements:Button>
+    </div>
+
+    <twig:Elements:Modal name="{{ this.modalName }}">
+        <twig:User:ContactEdit />
+    </twig:Elements:Modal>
+</div>

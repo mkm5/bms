@@ -1,0 +1,11 @@
+{% extends 'default_layout.html.twig' %}
+
+{% block title %}{{ contact.firstName }} {{ contact.lastName }} - Contacts{% endblock %}
+
+{% block header_title %}Contacts - {{ contact.firstName }} {{ contact.lastName }}{% endblock %}
+
+{% block header_extended %}{% endblock %}
+
+{% block content %}
+    <twig:User:ContactView :contact="contact" />
+{% endblock %}

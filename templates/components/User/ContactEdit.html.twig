@@ -1,0 +1,54 @@
+<div {{ attributes }}>
+    <h2 class="text-xl font-semibold text-gray-900 mb-4">
+        {{ viewContact is not null and viewContact.id is not empty ? 'Edit Contact' : 'New Contact' }}
+    </h2>
+
+    {{ form_start(form, {
+        attr: {
+            'data-action': 'live#action:prevent',
+            'data-live-action-param': 'save'
+        }
+    }) }}
+        {% do form.communcationChannels.setRendered %}
+        {{ form_row(form.firstName) }}
+        {{ form_row(form.lastName) }}
+
+        <div class="mt-4">
+            <label class="font-sans antialiased text-sm text-stone-800 font-semibold">Communication Channels</label>
+
+            <div class="mt-2 space-y-3">
+                {% for index, channel in form.communcationChannels %}
+                    <div class="flex gap-2 items-start p-3 bg-gray-50 rounded-lg">
+                        <div class="flex-1 grid grid-cols-2 gap-2">
+                            {{ form_widget(channel.type) }}
+                            {{ form_widget(channel.value, {attr: {placeholder: 'Enter value...'}}) }}
+                        </div>
+                        <button
+                            type="button"
+                            class="p-2 text-red-600 hover:text-red-800 hover:bg-red-100 rounded-lg transition-colors"
+                            data-action="live#action"
+                            data-live-action-param="removeChannel"
+                            data-live-index-param="{{ index }}"
+                        >
+                            <twig:ux:icon name="tabler:trash" class="w-5 h-5" />
+                        </button>
+                    </div>
+                {% else %}
+                    <p class="text-sm text-gray-500 italic py-2">No communication channels added yet.</p>
+                {% endfor %}
+            </div>
+
+            <button
+                type="button"
+                class="mt-3 inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
+                data-action="live#action"
+                data-live-action-param="addChannel"
+            >
+                <twig:ux:icon name="tabler:plus" class="w-4 h-4" />
+                Add Channel
+            </button>
+        </div>
+
+        <twig:Elements:Button type="submit" class="mt-6">Save</twig:Elements:Button>
+    {{ form_end(form) }}
+</div>
