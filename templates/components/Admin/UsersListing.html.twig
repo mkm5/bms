@@ -51,9 +51,7 @@
         <table class="w-full text-sm text-left text-gray-500">
             <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b border-gray-200">
                 <tr>
-                    <th class="px-6 py-3 font-medium whitespace-nowrap">Last name</th>
-                    <th class="px-6 py-3 font-medium whitespace-nowrap">First name</th>
-                    <th class="px-6 py-3 font-medium whitespace-nowrap">Email</th>
+                    <th class="px-6 py-3 font-medium whitespace-nowrap">Name</th>
                     <th class="px-6 py-3 font-medium whitespace-nowrap">Position</th>
                     <th class="px-6 py-3 font-medium whitespace-nowrap w-8">Status</th>
                     <th class="px-6 py-3 font-medium whitespace-nowrap w-8">Admin</th>
@@ -63,9 +61,10 @@
             <tbody class="divide-y divide-gray-200">
                 {%- for user in this.users -%}
                 <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4 font-medium text-gray-900">{{ user.lastName }}</td>
-                    <td class="px-6 py-4 font-medium text-gray-900">{{ user.firstName }}</td>
-                    <td class="px-6 py-4 font-medium text-gray-900">{{ user.email }}</td>
+                    <td class="px-6 py-4 font-medium text-gray-900">
+                        <div>{{ user.firstName }} {{ user.lastName }}</div>
+                        <div class="text-gray-400">{{ user.email }}</div>
+                    </td>
                     <td class="px-6 py-4 font-medium text-gray-900">{{ user.position }}</td>
                     <td class="px-6 py-4 text-center">
                         <twig:Elements:Pill
@@ -76,13 +75,6 @@
                     <td class="px-6 py-4 text-center">{{- user.isAdmin ? 'Yes' : 'No' -}}</td>
                     <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap text-right">
                         <div class="inline-flex items-center gap-2">
-                            <twig:Elements:Button
-                                variant="link"
-                                data-action="live#action"
-                                data-live-action-param="editUser"
-                                data-live-user-id-param="{{ user.id }}"
-                            >Edit</twig:Elements:Button>
-
                             <div class="relative inline-block text-left" data-controller="dropdown">
                                 <button
                                     type="button"
@@ -97,6 +89,16 @@
                                     data-dropdown-target="menu"
                                 >
                                     <div class="py-1">
+                                        <button
+                                            type="button"
+                                            data-action="live#action"
+                                            data-live-action-param="editUser"
+                                            data-live-contact-id-param="{{ user.id }}"
+                                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                                        >
+                                            <twig:ux:icon name="tabler:pencil" class="w-4 h-4" /> Edit
+                                        </button>
+
                                         {% if not user.isActive %}
                                         <button
                                             type="button"

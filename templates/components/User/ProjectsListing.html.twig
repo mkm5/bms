@@ -41,7 +41,6 @@
             <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b border-gray-200">
                 <tr>
                     <th class="px-6 py-3 font-medium whitespace-nowrap">Name</th>
-                    <th class="px-6 py-3 font-medium whitespace-nowrap">Description</th>
                     <th class="px-6 py-3 font-medium whitespace-nowrap">Managers</th>
                     <th class="px-6 py-3 font-medium whitespace-nowrap w-8">Status</th>
                     <th class="px-6 py-3 font-medium text-right whitespace-nowrap w-8">Actions</th>
@@ -50,8 +49,11 @@
             <tbody class="divide-y divide-gray-200">
                 {%- for project in this.projects -%}
                 <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4 font-medium text-gray-900">{{ project.name }}</td>
-                    <td class="px-6 py-4 text-gray-500 max-w-xs truncate">{{ project.description|default('-')|u.truncate(50) }}</td>
+                    <td class="px-6 py-4 font-medium text-gray-900">
+                        <twig:Elements:Button variant="link" href="{{ path('app_user_project_view', {id: project.id}) }}">
+                            {{ project.name }}
+                        </twig:Elements:Button>
+                    </td>
                     <td class="px-6 py-4 text-gray-500">
                         {% if project.managers|length > 0 %}
                             <div class="flex flex-wrap gap-1">
@@ -73,11 +75,6 @@
                     </td>
                     <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap text-right">
                         <div class="inline-flex items-center gap-2">
-                            <twig:Elements:Button
-                                variant="link"
-                                href="{{ path('app_user_project_view', {id: project.id}) }}"
-                            >View</twig:Elements:Button>
-
                             <div class="relative inline-block text-left" data-controller="dropdown">
                                 <button
                                     type="button"

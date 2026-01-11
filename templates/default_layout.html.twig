@@ -20,7 +20,7 @@
 {% block body %}
     <div
         data-controller="sidebar event-caller"
-        class="flex w-full h-full relative"
+        class="flex w-full h-full relative md:max-w-7xl md:mx-auto"
     >
         <div
             data-sidebar-target="overlay"
@@ -84,7 +84,7 @@
                     {{ _self.menu_group('CRM') }}
                     <ul class="space-y-1">
                         <li>{{ _self.menu_item('Companies', false, 'tabler:building-skyscraper', '#') }}</li>
-                        <li>{{ _self.menu_item('Contacts', false, 'tabler:user-share', '#') }}</li>
+                        <li>{{ _self.menu_item('Contacts', current_route == 'app_user_contacts', 'tabler:user-share', path('app_user_contacts')) }}</li>
                     </ul>
                 </div>
 
