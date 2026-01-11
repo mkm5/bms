@@ -28,7 +28,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 255, unique: true)]
-    #[Assert\Email]
+    #[Assert\Email(mode: Assert\Email::VALIDATION_MODE_HTML5_ALLOW_NO_TLD)]
     private ?string $email = null;
 
     /**
