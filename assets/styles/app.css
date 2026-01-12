@@ -86,3 +86,7 @@ select[multiple] {
     line-height: var(--text-sm--line-height) !important;
     padding: calc(var(--spacing) * 0.5) !important;
 }
+
+.ts-dropdown {
+    z-index: 9999 !important;
+}

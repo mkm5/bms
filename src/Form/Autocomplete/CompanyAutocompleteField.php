@@ -2,7 +2,7 @@
 
 namespace App\Form\Autocomplete;
 
-use App\Entity\User;
+use App\Entity\Company;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\Form\AbstractType;
@@ -11,13 +11,13 @@ use Symfony\UX\Autocomplete\Form\AsEntityAutocompleteField;
 use Symfony\UX\Autocomplete\Form\BaseEntityAutocompleteType;
 
 #[AsEntityAutocompleteField]
-class UserAutocompleteField extends AbstractType
+class CompanyAutocompleteField extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'class' => User::class,
-            'choice_label' => fn(User $user) => $user->getDisplayName(),
+            'class' => Company::class,
+            'choice_label' => fn(Company $company) => $company->getName(),
             'filter_query' => $this->filterQuery(...),
             'tom_select_options' => [
                 'dropdownParent' => 'body',
@@ -32,25 +32,16 @@ class UserAutocompleteField extends AbstractType
 
     private function filterQuery(QueryBuilder $qb, string $query, EntityRepository $repo): void
     {
-        $qb
-            ->andWhere('entity.isActive = :active')
-            ->setParameter('active', true)
-        ;
-
         if (!empty($query)) {
             $qb
                 ->andWhere(
-                    $qb->expr()->orX(
-                        $qb->expr()->like('enity.firstName', ':filter'),
-                        $qb->expr()->like('enity.lastName', ':filter'),
-                        $qb->expr()->like('enity.email', ':filter'),
-                    )
+                    $qb->expr()->like('LOWER(entity.name)', ':filter')
                 )
-                ->setParameter('filter', '%' . $query . '%')
+                ->setParameter('filter', '%' . strtolower($query) . '%')
             ;
         }
 
-        $qb->orderBy('entity.id', 'DESC');
+        $qb->orderBy('entity.name', 'ASC');
         $qb->setMaxResults(10);
     }
 }

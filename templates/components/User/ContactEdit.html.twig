@@ -1,4 +1,4 @@
-<div {{ attributes }}>
+<div {{ attributes.defaults({'data-controller': 'autocomplete-select-extend'}) }}>
     <h2 class="text-xl font-semibold text-gray-900 mb-4">
         {{ viewContact is not null and viewContact.id is not empty ? 'Edit Contact' : 'New Contact' }}
     </h2>
@@ -12,6 +12,7 @@
         {% do form.communcationChannels.setRendered %}
         {{ form_row(form.firstName) }}
         {{ form_row(form.lastName) }}
+        {{ form_row(form.company) }}
 
         <div class="mt-4">
             <label class="font-sans antialiased text-sm text-stone-800 font-semibold">Communication Channels</label>
