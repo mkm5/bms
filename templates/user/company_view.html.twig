@@ -1,0 +1,11 @@
+{% extends 'default_layout.html.twig' %}
+
+{% block title %}{{ company.name }} - Companies{% endblock %}
+
+{% block header_title %}Companies - {{ company.name }}{% endblock %}
+
+{% block header_extended %}{% endblock %}
+
+{% block content %}
+    <twig:User:CompanyView :company="company" />
+{% endblock %}

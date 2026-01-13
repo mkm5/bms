@@ -32,9 +32,9 @@
                 <div>
                     <h3 class="text-sm font-medium text-gray-500 mb-1">Company</h3>
                     {% if contact.company %}
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                        <a href="{{ path('app_user_company_view', {id: contact.company.id}) }}" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200">
                             {{ contact.company.name }}
-                        </span>
+                        </a>
                     {% else %}
                         <p class="text-gray-500">No company assigned.</p>
                     {% endif %}

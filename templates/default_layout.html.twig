@@ -83,7 +83,7 @@
                 <div>
                     {{ _self.menu_group('CRM') }}
                     <ul class="space-y-1">
-                        <li>{{ _self.menu_item('Companies', false, 'tabler:building-skyscraper', '#') }}</li>
+                        <li>{{ _self.menu_item('Companies', current_route == 'app_user_companies', 'tabler:building-skyscraper', path('app_user_companies')) }}</li>
                         <li>{{ _self.menu_item('Contacts', current_route == 'app_user_contacts', 'tabler:user-share', path('app_user_contacts')) }}</li>
                     </ul>
                 </div>

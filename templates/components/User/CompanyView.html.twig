@@ -1,0 +1,61 @@
+<div {{ attributes }}>
+    <div class="w-full space-y-6">
+        <div class="flex items-center gap-2 text-sm text-gray-500">
+            <a href="{{ path('app_user_companies') }}" class="hover:text-gray-900 hover:underline">Companies</a>
+            <twig:ux:icon name="tabler:chevron-right" class="w-4 h-4" />
+            <span class="text-gray-900">{{ company.name }}</span>
+        </div>
+
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-gray-900">Company Details</h2>
+                <twig:Elements:Button
+                    data-action="live#action"
+                    data-live-action-param="editCompany"
+                >
+                    <twig:ux:icon name="tabler:pencil" class="mr-2" />Edit
+                </twig:Elements:Button>
+            </div>
+            <div class="p-6 space-y-6">
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500 mb-1">Name</h3>
+                    <p class="text-gray-900">{{ company.name }}</p>
+                </div>
+
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500 mb-2">Contacts</h3>
+                    {% if company.contacts|length > 0 %}
+                        <div class="flex flex-wrap gap-2">
+                            {% for contact in company.contacts %}
+                                <a href="{{ path('app_user_contact_view', {id: contact.id}) }}" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200">
+                                    {{ contact.firstName }} {{ contact.lastName }}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-gray-500">No contacts assigned.</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500 mb-2">Projects</h3>
+                    {% if company.projects|length > 0 %}
+                        <div class="flex flex-wrap gap-2">
+                            {% for project in company.projects %}
+                                <a href="{{ path('app_user_project_view', {id: project.id}) }}" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 hover:bg-green-200">
+                                    {{ project.name }}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-gray-500">No projects assigned.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <twig:Elements:Modal name="{{ this.modalName }}">
+        <twig:User:CompanyEdit />
+    </twig:Elements:Modal>
+</div>
