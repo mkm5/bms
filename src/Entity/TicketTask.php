@@ -60,6 +60,12 @@ class TicketTask
         return $this;
     }
 
+    public function toggleFinished(): bool
+    {
+        $this->isFinished = !$this->isFinished;
+        return $this->isFinished;
+    }
+
     public function getTicket(): ?Ticket
     {
         return $this->ticket;

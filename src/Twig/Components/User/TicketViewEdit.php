@@ -3,6 +3,7 @@
 namespace App\Twig\Components\User;
 
 use App\Entity\Ticket;
+use App\Entity\TicketTask;
 use App\Form\TicketType;
 use App\Repository\TicketRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -103,5 +104,28 @@ final class TicketViewEdit extends AbstractController
     public function removeTask(#[LiveArg] int $index): void
     {
         unset($this->formValues['tasks'][$index]);
+    }
+
+    #[LiveAction]
+    public function toggleTask(#[LiveArg] int $taskId): void
+    {
+        if (!$this->viewTicket) {
+            return;
+        }
+
+        /** @var TicketTask */
+        foreach ($this->viewTicket->getTasks() as $task) {
+            if ($task->getId() === $taskId) {
+                $task->toggleFinished();
+                $this->em->flush();
+
+                /**
+                 * NOTE:
+                 * LiveComponent tries to hydrate entities from dehydrated state, not fresh from DB.
+                 * It is necessary to force a re-fetch.
+                 */
+                $this->resetForm();
+            }
+        }
     }
 }
