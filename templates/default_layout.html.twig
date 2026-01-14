@@ -20,7 +20,7 @@
 {% block body %}
     <div
         data-controller="sidebar event-caller"
-        class="flex w-full h-full relative md:max-w-7xl md:mx-auto"
+        class="flex w-full h-full relative md:max-w-[80%] md:mx-auto"
     >
         <div
             data-sidebar-target="overlay"
@@ -73,7 +73,7 @@
                 <div>
                     {{ _self.menu_group('Management') }}
                     <ul class="space-y-1">
-                        <li>{{ _self.menu_item('Dashboard', false, 'tabler:layout-dashboard', '#') }}</li>
+                        <li>{{ _self.menu_item('Board', current_route == 'app_user_board', 'tabler:layout-dashboard', path('app_user_board')) }}</li>
                         <li>{{ _self.menu_item('Projects', current_route == 'app_user_projects', 'tabler:briefcase', path('app_user_projects')) }}</li>
                         <li>{{ _self.menu_item('Tasks', false, 'tabler:checkbox', '#') }}</li>
                     </ul>

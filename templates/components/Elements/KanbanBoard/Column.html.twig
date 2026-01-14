@@ -1,0 +1,22 @@
+<div class="shrink-0 w-80 h-auto flex flex-col border-r border-gray-200 bg-gray-50/50">
+    <div class="p-4 border-b border-gray-200 bg-white sticky top-0 z-10">
+        <div class="flex items-center justify-between">
+            <h3 class="font-semibold text-sm text-gray-900 uppercase tracking-wide">{{ status.name }}</h3>
+            <span class="bg-gray-100 text-gray-600 text-xs font-medium px-2 py-0.5 rounded-full">{{ tickets|length }}</span>
+        </div>
+    </div>
+
+    <div
+        {#
+            Column Body (Drop Zone)
+            data-kanban-target="column" allows SortableJS to target this div
+        #}
+        {{ stimulus_target('kanban-board', 'column') }}
+        data-column-id="{{ status.id }}"
+        class="p-3 flex-1 overflow-y-auto space-y-3 min-h-[100px]"
+    >
+        {% for ticket in tickets %}
+            <twig:Elements:KanbanBoard:Ticket ticket="{{ ticket }}"/>
+        {% endfor %}
+    </div>
+</div>

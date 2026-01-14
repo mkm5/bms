@@ -7,13 +7,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Mapping\Annotation as Gedmo;
 use InvalidArgumentException;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
-#[UniqueEntity('slug')]
 class Project
 {
     #[ORM\Id]
@@ -24,10 +21,6 @@ class Project
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
     private ?string $name = null;
-
-    #[ORM\Column(length: 255, unique: true)]
-    #[Gedmo\Slug(fields: ['name'], unique: true)]
-    private ?string $slug = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
@@ -48,10 +41,17 @@ class Project
     #[ORM\ManyToMany(targetEntity: Company::class, mappedBy: 'projects')]
     private Collection $companies;
 
+    /**
+     * @var Collection<int, Ticket>
+     */
+    #[ORM\OneToMany(targetEntity: Ticket::class, mappedBy: 'project', orphanRemoval: true)]
+    private Collection $tickets;
+
     public function __construct()
     {
         $this->managers = new ArrayCollection();
         $this->companies = new ArrayCollection();
+        $this->tickets = new ArrayCollection();
     }
 
     public static function create(
@@ -87,17 +87,6 @@ class Project
         return $this;
     }
 
-    public function getSlug(): ?string
-    {
-        return $this->slug;
-    }
-
-    public function setSlug(string $slug): self
-    {
-        $this->slug = $slug;
-        return $this;
-    }
-
     public function getDescription(): ?string
     {
         return $this->description;
@@ -120,9 +109,7 @@ class Project
         return $this;
     }
 
-    /**
-     * @return Collection<int, User>
-     */
+    /** @return Collection<int, User> */
     public function getManagers(): Collection
     {
         return $this->managers;
@@ -142,9 +129,7 @@ class Project
         return $this;
     }
 
-    /**
-     * @return Collection<int, Company>
-     */
+    /** @return Collection<int, Company> */
     public function getCompanies(): Collection
     {
         return $this->companies;
@@ -165,6 +150,34 @@ class Project
         if ($this->companies->removeElement($company)) {
             $company->removeProject($this);
         }
+        return $this;
+    }
+
+    /** @return Collection<int, Ticket> */
+    public function getTickets(): Collection
+    {
+        return $this->tickets;
+    }
+
+    public function addTicket(Ticket $ticket): self
+    {
+        if (!$this->tickets->contains($ticket)) {
+            $this->tickets->add($ticket);
+            $ticket->setProject($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTicket(Ticket $ticket): self
+    {
+        if ($this->tickets->removeElement($ticket)) {
+            // set the owning side to null (unless already changed)
+            if ($ticket->getProject() === $this) {
+                $ticket->setProject(null);
+            }
+        }
+
         return $this;
     }
 }

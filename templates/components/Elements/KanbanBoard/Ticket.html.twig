@@ -1,0 +1,30 @@
+<div
+    {{ attributes.defaults({
+        'data-ticket-id': ticket.id,
+        'class': 'group bg-white p-4 rounded-md border border-gray-200 shadow-sm hover:shadow-md hover:border-gray-300 transition-all cursor-grab active:cursor-grabbing'
+    }) }}
+>
+    <div class="flex justify-between items-start mb-2">
+        <span class="text-xs font-mono text-gray-400 select-none">#{{ ticket.id }}</span>
+
+        <button
+            class="text-gray-400 hover:text-gray-800 hover:cursor-pointer transition-colors"
+            aria-label="View Task"
+            data-action="live#emit"
+            data-live-event-param="ticket:view"
+            data-live-ticket-param="{{ ticket.id }}"
+        >
+            <twig:ux:icon name="tabler:edit" />
+        </button>
+    </div>
+
+    <h4 class="text-sm font-medium text-gray-900 mb-3 leading-snug">{{ ticket.title }}</h4>
+
+    <div class="flex flex-wrap gap-2">
+        {%- for tag in ticket.tags -%}
+            <span class="inline-flex items-center px-2 py-1 rounded-full text-[10px] font-medium bg-gray-100 text-gray-600">
+                {{- tag.name -}}
+            </span>
+        {%- endfor -%}
+    </div>
+</div>

@@ -1,0 +1,53 @@
+<div {{ attributes }}>
+    {% if status == 'view' %}
+        <h3>{{ viewTicket.title }}</h3>
+        <p>Status: {{ viewTicket.status.name }}</p>
+
+        <button
+            class="btn btn-outline-secondary"
+            type="button"
+            data-action="live#emit"
+            data-live-event-param="ticket:edit"
+            data-live-ticket-param="{{ viewTicket.id }}"
+        >
+            <twig:ux:icon name="tabler:edit" />
+        </button>
+    {% elseif status == 'edit' %}
+        {{ form_start(form, {
+            attr: {
+                'data-action': 'live#action:prevent',
+                'data-live-action-param': 'save'
+            }
+        }) }}
+            {% do form.tasks.setRendered %}
+            {{ form_rest(form) }}
+
+            <div class="flex flex-col my-2">
+                <div class="flex flex-row justify-end">
+                    <twig:Elements:Button
+                        data-action="live#action"
+                        data-live-action-param="addTask"
+                    >
+                        Add Task
+                    </twig:Elements:Button>
+                </div>
+
+                {% for key, taskForm in form.tasks %}
+
+                    <div class="inline-flex flex-row">
+                        <twig:Elements:Button
+                            class="bg-red-500"
+                            data-action="live#action"
+                            data-live-action-param="removeTask"
+                            data-live-index-param="{{ key }}"
+                        >X</twig:Elements:Button>
+                        {{ form_widget(taskForm.isFinished) }}
+                        {{ form_widget(taskForm.description) }}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <twig:Elements:Button type="submit" class="mt-4">Save</twig:Elements:Button>
+        {{ form_end(form) }}
+    {% endif %}
+</div>

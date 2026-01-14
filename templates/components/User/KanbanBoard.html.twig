@@ -1,0 +1,29 @@
+<div
+    {{ attributes.defaults(stimulus_controller('kanban-board')) }}
+    id="kanban"
+    class="w-full min-h-full flex flex-col grow basis-auto relative"
+>
+    <div class="w-full flex items-start justify-end bg-transparent mb-4">
+        <twig:Elements:Button
+            data-action="live#emit"
+            data-live-action-param="ticket:edit"
+        >
+            New Ticket
+        </twig:Elements:Button>
+    </div>
+
+    <div class="kb-scroll-container flex w-full h-auto grow overflow-x-auto overflow-y-hidden border border-gray-200 bg-white shadow-sm rounded-lg">
+        <div class="flex flex-row h-auto grow">
+            {% for status in this.statuses %}
+                <twig:Elements:KanbanBoard:Column
+                    status="{{ status }}"
+                    tickets="{{ this.tickets|filter(t => t.status == status) }}"
+                />
+            {% endfor %}
+        </div>
+    </div>
+
+    <twig:Elements:Modal name="{{ this.modalName }}">
+        <twig:User:TicketViewEdit />
+    </twig:Elements:Modal>
+</div>
