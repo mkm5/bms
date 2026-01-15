@@ -25,6 +25,10 @@ final class KanbanBoard extends AbstractController
 
     private const MODAL_NAME = 'ticket';
 
+    private ?array $statuses = null;
+
+    private ?array $tickets = null;
+
     public function __construct(
         private readonly LoggerInterface $logger,
         private readonly TicketStatusRepository $ticketStatusRepository,
@@ -37,13 +41,13 @@ final class KanbanBoard extends AbstractController
     /** @return TicketStatus[] */
     public function getStatuses(): array
     {
-        return $this->ticketStatusRepository->findAllInDisplayOrder();
+        return $this->statuses ??= $this->ticketStatusRepository->findAllInDisplayOrder();
     }
 
     /** @return Ticket[] */
     public function getTickets(): array
     {
-        return $this->ticketRepository->findAll();
+        return $this->tickets ??= $this->ticketRepository->findAllForKanban();
     }
 
     #[LiveListener('ticket:update')]

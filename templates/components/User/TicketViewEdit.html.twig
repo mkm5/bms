@@ -1,5 +1,5 @@
 <div {{ attributes }}>
-    {% if status == 'view' %}
+    {% if viewTicket is not empty and status == 'view' %}
         <div class="space-y-6">
             <div class="pr-8">
                 <h2 class="text-xl font-semibold text-gray-900 wrap-break-word">{{ viewTicket.title }}</h2>

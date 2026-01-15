@@ -30,4 +30,22 @@ class TicketRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
+
+    /**
+     * @return Ticket[]
+     */
+    public function findAllForKanban(): array
+    {
+        return $this->createQueryBuilder('t')
+            ->leftJoin('t.project', 'p')
+            ->addSelect('p')
+            ->leftJoin('t.tags', 'tag')
+            ->addSelect('tag')
+            ->leftJoin('t.status', 's')
+            ->addSelect('s')
+            ->addOrderBy('t.displayOrder', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }

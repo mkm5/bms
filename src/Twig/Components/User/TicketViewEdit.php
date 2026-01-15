@@ -29,7 +29,7 @@ final class TicketViewEdit extends AbstractController
     public string $editModalName = 'ticket';
 
     #[LiveProp]
-    public string $status = 'edit';
+    public string $status = 'view';
 
     #[LiveProp]
     public ?Ticket $viewTicket = null;
@@ -42,6 +42,9 @@ final class TicketViewEdit extends AbstractController
 
     protected function instantiateForm(): FormInterface
     {
+        // if (null === $this->viewTicket && 'view' === $this->status) {
+        //     return $this->createFormBuilder()->getForm();
+        // }
         return $this->createForm(TicketType::class, $this->viewTicket);
     }
 

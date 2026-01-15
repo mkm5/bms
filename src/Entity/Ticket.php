@@ -34,6 +34,7 @@ class Ticket
      * @var Collection<int, Tag>
      */
     #[ORM\ManyToMany(targetEntity: Tag::class)]
+    #[ORM\OrderBy(['id' => 'ASC'])]
     private Collection $tags;
 
     /**
