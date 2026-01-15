@@ -6,6 +6,7 @@ use App\Entity\Ticket;
 use App\Entity\TicketStatus;
 use App\Repository\TicketRepository;
 use App\Repository\TicketStatusRepository;
+use App\Service\TicketMover;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,7 +29,8 @@ final class KanbanBoard extends AbstractController
         private readonly LoggerInterface $logger,
         private readonly TicketStatusRepository $ticketStatusRepository,
         private readonly TicketRepository $ticketRepository,
-        private readonly EntityManagerInterface $entityManager,
+        private readonly EntityManagerInterface $em,
+        private readonly TicketMover $ticketMover,
     ) {
     }
 
@@ -58,37 +60,8 @@ final class KanbanBoard extends AbstractController
         #[LiveArg] ?int $followingTicket,
     ): void
     {
-        /** @var Ticket */
-        if (!($currentTicket = $this->ticketRepository->find($ticket))) {
-            return;
-        }
-
-        /** @var TicketStatus */
-        if (!($status = $this->ticketStatusRepository->find($targetStatus))) {
-            return;
-        }
-
-        $currentTicket->setDisplayOrder(0);
-        $currentTicket->setStatus($status);
-        $tickets = $status->getTickets();
-
-        $i = 0;
-        $found = $precedingTicket === null ? true : false;
-        foreach ($tickets as $ticket) {
-            if ($precedingTicket !== null && $ticket->getId() === $precedingTicket) {
-                $currentTicket->setDisplayOrder($ticket->getDisplayOrder() + 1);
-                $found = true;
-                continue;
-            }
-
-            if (!$found || $ticket->getId() === $currentTicket->getId()) {
-                continue;
-            }
-
-            $ticket->setDisplayOrder($currentTicket->getDisplayOrder() + $i++ + 1);
-        }
-
-        $this->entityManager->flush();
+        $this->ticketMover->move($ticket, $targetStatus, $precedingTicket);
+        $this->em->flush();
     }
 
     public function getModalName(): string

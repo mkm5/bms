@@ -366,7 +366,7 @@ class AppFixtures extends Fixture
         $ticketInv5 = Ticket::create(
             $projectInventory,
             'Warehouse map visualization',
-            $ticketStatusToDo,
+            $ticketStatusDone,
             'Interactive SVG map showing real-time stock levels per shelf.',
             [$tagFeature, $tagFrontend, $tagUx],
         );
