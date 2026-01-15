@@ -5,7 +5,10 @@
     }) }}
 >
     <div class="flex justify-between items-start mb-2">
-        <span class="text-xs font-mono text-gray-400 select-none">#{{ ticket.id }}</span>
+        <div class="min-w-0 flex-1 mr-2">
+            <span class="text-xs font-mono text-gray-400 select-none">#{{ ticket.id }}</span>
+            <p class="text-[10px] text-gray-400 truncate" title="{{ ticket.project.name }}">{{ ticket.project.name }}</p>
+        </div>
 
         <button
             class="text-gray-400 hover:text-gray-800 hover:cursor-pointer transition-colors"
