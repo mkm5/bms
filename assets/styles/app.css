@@ -90,3 +90,8 @@ select[multiple] {
 .ts-dropdown {
     z-index: 9999 !important;
 }
+
+label.required::after {
+    content: " *";
+    color: var(--color-red-500);
+}
