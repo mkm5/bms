@@ -101,3 +101,21 @@
     {%- set label_attr = label_attr|merge({class: (label_attr.class|default('cursor-pointer text-stone-600 text-sm'))}) -%}
     {{- parent() -}}
 {%- endblock checkbox_label -%} #}
+
+{%- block radio_widget -%}
+    {%-
+        set widget_class = widget_class|default('h-4 w-4 cursor-pointer transition-all appearance-none rounded-full border border-stone-300 checked:border-stone-800 checked:border-4')
+    -%}
+    {{- parent() -}}
+{%- endblock radio_widget -%}
+
+{%- block choice_widget_expanded -%}
+    <div class="flex flex-col gap-1">
+        {%- for child in form %}
+            <div class="flex items-center gap-2">
+                {{- form_widget(child) -}}
+                {{- form_label(child, null, {translation_domain: choice_translation_domain}) -}}
+            </div>
+        {% endfor -%}
+    </div>
+{%- endblock choice_widget_expanded -%}

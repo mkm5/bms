@@ -6,9 +6,11 @@ use App\Config\FormFieldType;
 use App\Entity\FormDefinition;
 use App\Entity\FormField;
 use App\Form\FormDefinitionType;
+use App\Service\FormDefinitionFormBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
@@ -33,6 +35,7 @@ final class FormBuilder extends AbstractController
 
     public function __construct(
         private readonly EntityManagerInterface $em,
+        private readonly FormDefinitionFormBuilder $formDefinitionFormBuilder,
     ) {
     }
 
@@ -93,6 +96,54 @@ final class FormBuilder extends AbstractController
     }
 
     #[LiveAction]
+    public function updateChoiceLabel(#[LiveArg] int $fieldIndex, #[LiveArg] int $choiceIndex, #[LiveArg] string $value): void
+    {
+        $this->fieldOptions[$fieldIndex]['choices'][$choiceIndex]['label'] = $value;
+    }
+
+    #[LiveAction]
+    public function updateChoiceValue(#[LiveArg] int $fieldIndex, #[LiveArg] int $choiceIndex, #[LiveArg] string $value): void
+    {
+        $this->fieldOptions[$fieldIndex]['choices'][$choiceIndex]['value'] = $value;
+    }
+
+    #[LiveAction]
+    public function updateMultiple(#[LiveArg] int $fieldIndex, #[LiveArg] bool $value): void
+    {
+        $this->fieldOptions[$fieldIndex]['multiple'] = $value;
+    }
+
+    #[LiveAction]
+    public function updateExpanded(#[LiveArg] int $fieldIndex, #[LiveArg] bool $value): void
+    {
+        $this->fieldOptions[$fieldIndex]['expanded'] = $value;
+    }
+
+    #[LiveAction]
+    public function toggleChoiceDefault(#[LiveArg] int $fieldIndex, #[LiveArg] int $choiceIndex): void
+    {
+        if (!isset($this->fieldOptions[$fieldIndex]['defaults'])) {
+            $this->fieldOptions[$fieldIndex]['defaults'] = [];
+        }
+
+        $defaults = &$this->fieldOptions[$fieldIndex]['defaults'];
+        $key = array_search($choiceIndex, $defaults, true);
+
+        if ($key !== false) {
+            unset($defaults[$key]);
+            $defaults = array_values($defaults);
+        } else {
+            $defaults[] = $choiceIndex;
+        }
+    }
+
+    #[LiveAction]
+    public function updateRangeOption(#[LiveArg] int $fieldIndex, #[LiveArg] string $option, #[LiveArg] int $value): void
+    {
+        $this->fieldOptions[$fieldIndex][$option] = $value;
+    }
+
+    #[LiveAction]
     public function save(): RedirectResponse
     {
         $this->submitForm();
@@ -126,21 +177,57 @@ final class FormBuilder extends AbstractController
     {
         $type = $field->getType();
 
-        $finalOptions = match (true) {
-            $type === FormFieldType::SELECT,
-            $type === FormFieldType::RADIO => [
+        $finalOptions = match ($type) {
+            FormFieldType::CHOICE => [
                 'choices' => $options['choices'] ?? [],
-                'multiselect' => (bool) ($options['multiselect'] ?? false),
-                'preselected' => $options['preselected'] ?? null,
+                'multiple' => (bool) ($options['multiple'] ?? false),
+                'expanded' => (bool) ($options['expanded'] ?? false),
+                'defaults' => array_map('intval', $options['defaults'] ?? []),
             ],
-            $type === FormFieldType::RANGE => [
+            FormFieldType::RANGE => [
                 'min' => (int) ($options['min'] ?? 0),
                 'max' => (int) ($options['max'] ?? 100),
                 'step' => (int) ($options['step'] ?? 1),
             ],
-            default => null,
+            default => [],
         };
 
         $field->setOptions($finalOptions);
+    }
+
+    public function getPreviewForm(): ?FormView
+    {
+        $fields = $this->formValues['fields'] ?? [];
+        if (empty($fields)) {
+            return null;
+        }
+
+        $previewDefinition = new FormDefinition();
+        $previewDefinition->setName($this->formValues['name'] ?? 'Preview');
+
+        foreach ($fields as $index => $fieldData) {
+            if (empty($fieldData['name'])) {
+                continue;
+            }
+
+            $field = new FormField();
+            $field->setName($fieldData['name']);
+            $field->setHelpText($fieldData['helpText'] ?? null);
+            $field->setIsRequired((bool) ($fieldData['isRequired'] ?? false));
+            $field->setType(FormFieldType::tryFrom($fieldData['type'] ?? 'text') ?? FormFieldType::TEXT);
+
+            $this->applyFieldOptions($field, $this->fieldOptions[$index] ?? []);
+
+            $previewDefinition->addField($field);
+        }
+
+        if ($previewDefinition->getFields()->isEmpty()) {
+            return null;
+        }
+
+        return $this->formDefinitionFormBuilder
+            ->createForm($previewDefinition)
+            ->createView()
+        ;
     }
 }

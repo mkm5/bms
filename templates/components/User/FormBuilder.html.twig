@@ -36,7 +36,7 @@
             <div class="space-y-4">
                 {% for index, fieldForm in form.fields %}
                     {% set fieldType = this.formValues.fields[index].type|default('text') %}
-                    {% set hasChoices = fieldType in ['select', 'radio'] %}
+                    {% set hasChoices = fieldType == 'choice' %}
                     {% set isRange = fieldType == 'range' %}
 
                     <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
@@ -91,36 +91,44 @@
                                 </div>
 
                                 {% set choices = this.fieldOptions[index].choices|default([]) %}
+                                {% set defaults = this.fieldOptions[index].defaults|default([]) %}
                                 <div class="space-y-2">
                                     {% for choiceIndex, choice in choices %}
                                         <div class="flex gap-2 items-center">
                                             <input
-                                                type="text"
-                                                name="fieldOptions[{{ index }}][choices][{{ choiceIndex }}][label]"
-                                                value="{{ choice.label }}"
-                                                placeholder="Label"
-                                                class="flex-1 rounded-lg border-gray-300 text-sm"
-                                                data-model="fieldOptions.{{ index }}.choices.{{ choiceIndex }}.label"
+                                                type="checkbox"
+                                                {{ choiceIndex in defaults ? 'checked' : '' }}
+                                                data-action="change->live#action"
+                                                data-live-action-param="toggleChoiceDefault"
+                                                data-live-field-index-param="{{ index }}"
+                                                data-live-choice-index-param="{{ choiceIndex }}"
+                                                class="rounded border-gray-300 text-blue-600"
+                                                title="Set as default"
                                             />
                                             <input
                                                 type="text"
-                                                name="fieldOptions[{{ index }}][choices][{{ choiceIndex }}][value]"
+                                                value="{{ choice.label }}"
+                                                placeholder="Label"
+                                                class="flex-1 rounded-lg border-gray-300 text-sm"
+                                                data-action="change->live#action"
+                                                data-live-action-param="updateChoiceLabel"
+                                                data-live-field-index-param="{{ index }}"
+                                                data-live-choice-index-param="{{ choiceIndex }}"
+                                                data-live-value-param=""
+                                                onchange="this.dataset.liveValueParam = this.value"
+                                            />
+                                            <input
+                                                type="text"
                                                 value="{{ choice.value }}"
                                                 placeholder="Value"
                                                 class="flex-1 rounded-lg border-gray-300 text-sm"
-                                                data-model="fieldOptions.{{ index }}.choices.{{ choiceIndex }}.value"
+                                                data-action="change->live#action"
+                                                data-live-action-param="updateChoiceValue"
+                                                data-live-field-index-param="{{ index }}"
+                                                data-live-choice-index-param="{{ choiceIndex }}"
+                                                data-live-value-param=""
+                                                onchange="this.dataset.liveValueParam = this.value"
                                             />
-                                            <label class="flex items-center gap-1 text-xs text-gray-600">
-                                                <input
-                                                    type="radio"
-                                                    name="fieldOptions[{{ index }}][preselected]"
-                                                    value="{{ choice.value }}"
-                                                    {{ this.fieldOptions[index].preselected|default('') == choice.value ? 'checked' : '' }}
-                                                    data-model="fieldOptions.{{ index }}.preselected"
-                                                    class="text-blue-600"
-                                                />
-                                                Default
-                                            </label>
                                             <button
                                                 type="button"
                                                 class="p-1 text-red-600 hover:text-red-800 hover:bg-red-100 rounded transition-colors"
@@ -137,20 +145,36 @@
                                     {% endfor %}
                                 </div>
 
-                                {% if fieldType == 'select' %}
-                                    <div class="mt-3 flex items-center">
+                                <div class="mt-3 flex items-center gap-6">
+                                    <div class="flex items-center">
                                         <input
                                             type="checkbox"
-                                            name="fieldOptions[{{ index }}][multiselect]"
-                                            id="multiselect_{{ index }}"
-                                            value="1"
-                                            {{ this.fieldOptions[index].multiselect|default(false) ? 'checked' : '' }}
-                                            data-model="fieldOptions.{{ index }}.multiselect"
+                                            id="multiple_{{ index }}"
+                                            {{ this.fieldOptions[index].multiple|default(false) ? 'checked' : '' }}
+                                            data-action="change->live#action"
+                                            data-live-action-param="updateMultiple"
+                                            data-live-field-index-param="{{ index }}"
+                                            data-live-value-param=""
+                                            onchange="this.dataset.liveValueParam = this.checked"
                                             class="rounded border-gray-300 text-blue-600"
                                         />
-                                        <label for="multiselect_{{ index }}" class="ml-2 text-sm text-gray-700">Allow multiple selection</label>
+                                        <label for="multiple_{{ index }}" class="ml-2 text-sm text-gray-700">Multiple</label>
                                     </div>
-                                {% endif %}
+                                    <div class="flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            id="expanded_{{ index }}"
+                                            {{ this.fieldOptions[index].expanded|default(false) ? 'checked' : '' }}
+                                            data-action="change->live#action"
+                                            data-live-action-param="updateExpanded"
+                                            data-live-field-index-param="{{ index }}"
+                                            data-live-value-param=""
+                                            onchange="this.dataset.liveValueParam = this.checked"
+                                            class="rounded border-gray-300 text-blue-600"
+                                        />
+                                        <label for="expanded_{{ index }}" class="ml-2 text-sm text-gray-700">Expanded</label>
+                                    </div>
+                                </div>
                             </div>
                         {% elseif isRange %}
                             {# Range Options #}
@@ -161,30 +185,42 @@
                                         <label class="text-xs text-gray-600">Min</label>
                                         <input
                                             type="number"
-                                            name="fieldOptions[{{ index }}][min]"
                                             value="{{ this.fieldOptions[index].min|default(0) }}"
                                             class="w-full rounded-lg border-gray-300 text-sm"
-                                            data-model="fieldOptions.{{ index }}.min"
+                                            data-action="change->live#action"
+                                            data-live-action-param="updateRangeOption"
+                                            data-live-field-index-param="{{ index }}"
+                                            data-live-option-param="min"
+                                            data-live-value-param=""
+                                            onchange="this.dataset.liveValueParam = this.value"
                                         />
                                     </div>
                                     <div>
                                         <label class="text-xs text-gray-600">Max</label>
                                         <input
                                             type="number"
-                                            name="fieldOptions[{{ index }}][max]"
                                             value="{{ this.fieldOptions[index].max|default(100) }}"
                                             class="w-full rounded-lg border-gray-300 text-sm"
-                                            data-model="fieldOptions.{{ index }}.max"
+                                            data-action="change->live#action"
+                                            data-live-action-param="updateRangeOption"
+                                            data-live-field-index-param="{{ index }}"
+                                            data-live-option-param="max"
+                                            data-live-value-param=""
+                                            onchange="this.dataset.liveValueParam = this.value"
                                         />
                                     </div>
                                     <div>
                                         <label class="text-xs text-gray-600">Step</label>
                                         <input
                                             type="number"
-                                            name="fieldOptions[{{ index }}][step]"
                                             value="{{ this.fieldOptions[index].step|default(1) }}"
                                             class="w-full rounded-lg border-gray-300 text-sm"
-                                            data-model="fieldOptions.{{ index }}.step"
+                                            data-action="change->live#action"
+                                            data-live-action-param="updateRangeOption"
+                                            data-live-field-index-param="{{ index }}"
+                                            data-live-option-param="step"
+                                            data-live-value-param=""
+                                            onchange="this.dataset.liveValueParam = this.value"
                                         />
                                     </div>
                                 </div>
@@ -206,4 +242,19 @@
             </twig:Elements:Button>
         </div>
     {{ form_end(form) }}
+
+    {# Form Preview #}
+    {% set previewForm = this.previewForm %}
+    {% if previewForm %}
+        <div class="mt-8 pt-8 border-t border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Preview</h3>
+            <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                {{ form_start(previewForm, {attr: {onsubmit: 'return false'}}) }}
+                    {% for field in previewForm.children %}
+                        {{ form_row(field) }}
+                    {% endfor %}
+                {{ form_end(previewForm, {render_rest: false}) }}
+            </div>
+        </div>
+    {% endif %}
 </div>

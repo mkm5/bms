@@ -13,8 +13,7 @@ enum FormFieldType: string
     case DATETIME = 'datetime';
     case RANGE = 'range';
     case CHECKBOX = 'checkbox';
-    case SELECT = 'select';
-    case RADIO = 'radio';
+    case CHOICE = 'choice';
 
     public function label(): string
     {
@@ -28,14 +27,13 @@ enum FormFieldType: string
             self::DATETIME => 'Date & Time',
             self::RANGE => 'Range',
             self::CHECKBOX => 'Checkbox',
-            self::SELECT => 'Select',
-            self::RADIO => 'Radio Group',
+            self::CHOICE => 'Choice',
         };
     }
 
     public function hasChoices(): bool
     {
-        return in_array($this, [self::SELECT, self::RADIO], true);
+        return $this === self::CHOICE;
     }
 
     public function isSimpleInput(): bool
