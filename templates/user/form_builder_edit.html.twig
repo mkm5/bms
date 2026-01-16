@@ -1,0 +1,11 @@
+{% extends 'default_layout.html.twig' %}
+
+{% block title %}{{ formDefinition is defined and formDefinition is not null ? 'Edit Form' : 'New Form' }} - Form Builder{% endblock %}
+
+{% block header_title %}Form Builder{% endblock %}
+
+{% block content %}
+    <div class="max-w-4xl mx-auto">
+        <twig:User:FormBuilder :formDefinition="formDefinition|default(null)" />
+    </div>
+{% endblock %}
