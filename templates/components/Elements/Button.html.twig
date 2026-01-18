@@ -30,7 +30,7 @@
 {%- set element = (attributes.has('href')) ? 'a' : 'button' -%}
 <{{ element }}
     {% if disabled %}disabled{% endif %}
-    class="{{ button_cva.apply({variant, size}, attributes.render('class'))|tailwind_merge }}"
+    class="{{ button_cva.apply({variant, size, width}, attributes.render('class'))|tailwind_merge }}"
     {{ attributes }}
 >
     {%- block content -%}{%- endblock -%}
