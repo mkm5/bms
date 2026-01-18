@@ -32,6 +32,8 @@ class ProjectAutocompleteField extends AbstractType
 
     private function filterQuery(QueryBuilder $qb, string $query, EntityRepository $repo): void
     {
+        $qb->andWhere('entity.isFinished = false');
+
         if (!empty($query)) {
             $qb
                 ->andWhere(
