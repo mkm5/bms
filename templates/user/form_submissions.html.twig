@@ -1,0 +1,9 @@
+{% extends 'default_layout.html.twig' %}
+
+{% block title %}{{ formDefinition.name }} - Submissions{% endblock %}
+
+{% block header_title %}{{ formDefinition.name }} - Submissions{% endblock %}
+
+{% block content %}
+    <twig:User:FormSubmissionsListing :formDefinition="formDefinition"/>
+{% endblock %}

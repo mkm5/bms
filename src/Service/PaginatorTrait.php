@@ -6,8 +6,18 @@ trait PaginatorTrait
 {
     abstract protected function getPaginator(): Paginator;
 
-    public function getItems(): array { return $this->getPaginator()->getItems(); }
-    public function getTotalItems(): int { return $this->getPaginator()->getTotalItems(); }
+    private ?array $_items = null;
+
+    private ?int $_totalItems = null;
+
+    public function getItems(): array {
+        return $this->_items ??= $this->getPaginator()->getItems();
+    }
+
+    public function getTotalItems(): int {
+        return $this->_totalItems ??= $this->getPaginator()->getTotalItems();
+    }
+
     public function getTotalPages(): int { return $this->getPaginator()->getTotalPages(); }
     public function hasPreviousPage(): bool { return $this->getPaginator()->hasPreviousPage(); }
     public function hasNextPage(): bool { return $this->getPaginator()->hasNextPage(); }

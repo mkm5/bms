@@ -23,4 +23,12 @@ final class FormBuilderController extends AbstractController
             'formDefinition' => $formDefinition,
         ]);
     }
+
+    #[Route('/forms/{id}/submissions', name: 'app_user_form_submissions')]
+    public function submissions(FormDefinition $formDefinition): Response
+    {
+        return $this->render('user/form_submissions.html.twig', [
+            'formDefinition' => $formDefinition,
+        ]);
+    }
 }

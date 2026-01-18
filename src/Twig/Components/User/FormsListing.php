@@ -5,6 +5,8 @@ namespace App\Twig\Components\User;
 use App\Entity\FormDefinition;
 use App\Entity\Project;
 use App\Repository\FormDefinitionRepository;
+use App\Repository\FormFieldRepository;
+use App\Repository\FormSubmissionRepository;
 use App\Service\Paginator;
 use App\Service\PaginatorTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -32,9 +34,39 @@ final class FormsListing extends AbstractController
 
     private ?Paginator $paginator = null;
 
+    /** @var array<int, int>|null */
+    private ?array $fieldCounts = null;
+
+    /** @var array<int, int>|null */
+    private ?array $submissionCounts = null;
+
     public function __construct(
         private readonly FormDefinitionRepository $formDefinitionRepository,
+        private readonly FormFieldRepository $formFieldRepository,
+        private readonly FormSubmissionRepository $formSubmissionRepository,
     ) {
+    }
+
+    public function getFieldCount(FormDefinition $form): int
+    {
+        if (empty($this->fieldCounts)) {
+            $this->fieldCounts = $this->formFieldRepository->countByForms(
+                array_map(fn (FormDefinition $f) => $f->getId(), $this->getForms())
+            );
+        }
+
+        return $this->fieldCounts[$form->getId()] ?? 0;
+    }
+
+    public function getSubmissionCount(FormDefinition $form): int
+    {
+        if (empty($this->submissionCounts)) {
+            $this->submissionCounts = $this->formSubmissionRepository->countByForms(
+                array_map(fn (FormDefinition $f) => $f->getId(), $this->getForms())
+            );
+        }
+
+        return $this->submissionCounts[$form->getId()] ?? 0;
     }
 
     private function countForms(): int

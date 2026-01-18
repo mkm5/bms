@@ -1,0 +1,109 @@
+{% import "elements.html.twig" as c %}
+
+<div
+    class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"
+    {{ attributes }}
+>
+    <div class="px-6 py-4 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <input
+            class="{{ c._input('w-64') }}"
+            type="text"
+            data-model="debounce(150)|search"
+            placeholder="Search..."
+        >
+
+        <span class="text-sm text-gray-500">{{ this.totalSubmissions }} total</span>
+    </div>
+
+    {% if this.submissions|length > 0 %}
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left text-gray-500">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b border-gray-200">
+                    <tr>
+                        {% for field in this.fields %}
+                            <th class="px-6 py-3 font-medium whitespace-nowrap">{{ field.name }}</th>
+                        {% endfor %}
+                        <th class="px-6 py-3 font-medium whitespace-nowrap">Submitted At</th>
+                        <th class="px-6 py-3 font-medium text-right whitespace-nowrap w-8">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {%- for submission in this.submissions -%}
+                    <tr class="hover:bg-gray-50">
+                        {% for field in this.fields %}
+                            <td class="px-6 py-4 text-gray-900">
+                                {% set value = submission.data[field.label] ?? null %}
+                                {% if value is null %}
+                                    <span class="text-gray-400">-</span>
+                                {% elseif value is iterable %}
+                                    {{ value|join(', ') }}
+                                {% else %}
+                                    {{ value }}
+                                {% endif %}
+                            </td>
+                        {% endfor %}
+                        <td class="px-6 py-4 text-gray-500 whitespace-nowrap">
+                            {{ submission.submittedAt|date('Y-m-d H:i') }}
+                        </td>
+                        <td class="px-6 py-4 text-right whitespace-nowrap">
+                            <twig:Elements:Button
+                                variant="link"
+                                data-action="live#action"
+                                data-live-action-param="delete"
+                                data-live-id-param="{{ submission.id }}"
+                                data-loading="addClass(opacity-50)"
+                            >
+                                <twig:ux:icon name="tabler:trash" class="w-4 h-4 text-red-600" />
+                            </twig:Elements:Button>
+                        </td>
+                    </tr>
+                    {%- endfor -%}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="flex my-2 mx-4 justify-between items-center">
+            <twig:Elements:Button
+                variant="link"
+                size="lg"
+                data-action="live#update"
+                data-model="page"
+                data-value="{{ this.page - 1}}"
+                disabled="{{ not this.hasPreviousPage }}"
+            >Previous</twig:Elements:Button>
+
+            <div class="flex gap-1 items-center">
+                {% for pageNum in this.pageNumbers %}
+                    {% if pageNum == '...' %}
+                        <span class="px-3 py-1 text-gray-400 select-none">...</span>
+                    {% else %}
+                        <twig:Elements:Button
+                            data-action="live#update"
+                            data-model="page"
+                            data-value="{{ pageNum }}"
+                            variant="{{ pageNum == this.page ? 'primary' : 'link' }}"
+                            disabled="{{ pageNum == this.page }}"
+                        >{{ pageNum }}</twig:Elements:Button>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            <twig:Elements:Button
+                variant="link"
+                size="lg"
+                data-action="live#update"
+                data-model="page"
+                data-value="{{ this.page + 1}}"
+                disabled="{{ not this.hasNextPage }}"
+            >Next</twig:Elements:Button>
+        </div>
+    {% else %}
+        <div class="px-6 py-12 text-center text-gray-500">
+            {% if this.search %}
+                No submissions found for "{{ this.search }}".
+            {% else %}
+                No submissions yet.
+            {% endif %}
+        </div>
+    {% endif %}
+</div>

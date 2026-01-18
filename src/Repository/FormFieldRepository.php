@@ -13,4 +13,27 @@ class FormFieldRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, FormField::class);
     }
+
+    /** @return array<int, int> formId => count */
+    public function countByForms(array $formIds): array
+    {
+        if (empty($formIds)) {
+            return [];
+        }
+
+        $result = $this->createQueryBuilder('f')
+            ->select('IDENTITY(f.formDefinition) as formId, COUNT(f.id) as cnt')
+            ->where('f.formDefinition IN (:formIds)')
+            ->setParameter('formIds', $formIds)
+            ->groupBy('f.formDefinition')
+            ->getQuery()
+            ->getArrayResult();
+
+        $counts = [];
+        foreach ($result as $row) {
+            $counts[(int) $row['formId']] = (int) $row['cnt'];
+        }
+
+        return $counts;
+    }
 }
