@@ -1,0 +1,98 @@
+{% import "elements.html.twig" as c %}
+
+<div
+    class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"
+    {{ attributes }}
+>
+    <div class="px-6 py-4 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex gap-2">
+            <input
+                class="{{ c._input('w-64') }}"
+                type="text"
+                data-model="debounce(150)|search"
+                placeholder="Search..."
+            >
+        </div>
+        <twig:Elements:Button href="{{ path('app_user_form_builder_new') }}">
+            <twig:ux:icon name="tabler:forms" class="mr-2" />New Form
+        </twig:Elements:Button>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left text-gray-500">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b border-gray-200">
+                <tr>
+                    <th class="px-6 py-3 font-medium whitespace-nowrap">Name</th>
+                    {% if not this.project %}
+                        <th class="px-6 py-3 font-medium whitespace-nowrap">Project</th>
+                    {% endif %}
+                    <th class="px-6 py-3 font-medium whitespace-nowrap">Fields</th>
+                    <th class="px-6 py-3 font-medium text-right whitespace-nowrap w-8">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {%- for form in this.forms -%}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 font-medium text-gray-900">
+                        <twig:Elements:Button variant="link" href="{{ path('app_user_form_builder_edit', {id: form.id}) }}">
+                            {{ form.name }}
+                        </twig:Elements:Button>
+                    </td>
+                    {% if not this.project %}
+                        <td class="px-6 py-4 text-gray-500">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                {{- form.project.name -}}
+                            </span>
+                        </td>
+                    {% endif %}
+                    <td class="px-6 py-4 text-gray-500">{{ form.fields|length }}</td>
+                    <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap text-right">
+                        <twig:Elements:Button
+                            variant="ghost"
+                            size="sm"
+                            href="{{ path('app_user_form_builder_edit', {id: form.id}) }}"
+                        >
+                            <twig:ux:icon name="tabler:pencil" class="w-4 h-4" />
+                        </twig:Elements:Button>
+                    </td>
+                </tr>
+                {%- endfor -%}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="flex my-2 mx-4 justify-between items-center">
+        <twig:Elements:Button
+            variant="link"
+            size="lg"
+            data-action="live#update"
+            data-model="page"
+            data-value="{{ this.page - 1}}"
+            disabled="{{ not this.hasPreviousPage }}"
+        >Previous</twig:Elements:Button>
+
+        <div class="flex gap-1 items-center">
+            {% for pageNum in this.pageNumbers %}
+                {% if pageNum == '...' %}
+                    <span class="px-3 py-1 text-gray-400 select-none">...</span>
+                {% else %}
+                    <twig:Elements:Button
+                        data-action="live#update"
+                        data-model="page"
+                        data-value="{{ pageNum }}"
+                        variant="{{ pageNum == this.page ? 'primary' : 'link' }}"
+                        disabled="{{ pageNum == this.page }}"
+                    >{{ pageNum }}</twig:Elements:Button>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <twig:Elements:Button
+            variant="link"
+            size="lg"
+            data-action="live#update"
+            data-model="page"
+            data-value="{{ this.page + 1}}"
+            disabled="{{ not this.hasNextPage }}"
+        >Next</twig:Elements:Button>
+    </div>
+</div>

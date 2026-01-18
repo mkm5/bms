@@ -4,14 +4,15 @@
     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">{{ name }}</p>
 {% endmacro %}
 
-{% macro menu_item(name, is_active, icon, url) %}
-    {% set item_classes = is_active
+{% macro menu_item(name, icon, route, params = []) %}
+    {%- set is_active = route == app.request.attributes.get('_route') -%}
+    {%- set item_classes = is_active
         ? "flex items-center gap-3 px-4 py-2 bg-gray-900 text-white rounded-lg group transition-all shadow-md"
         : "flex items-center gap-3 px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-100 hover:text-black group transition-all"
-    %}
-    {% set icon_classes = is_active ? "text-xl text-white" : "text-xl text-gray-500 group-hover:text-black" %}
+    -%}
+    {%- set icon_classes = is_active ? "text-xl text-white" : "text-xl text-gray-500 group-hover:text-black" -%}
 
-    <a href="{{ url }}" class="{{ item_classes }}">
+    <a href="{{ route == '#' ? null : path(route, params) }}" class="{{ item_classes }}">
         <twig:ux:icon name="{{ icon }}" class="{{ icon_classes }}" />
         <span class="whitespace-nowrap font-medium">{{ name }}</span>
     </a>
@@ -73,9 +74,10 @@
                 <div>
                     {{ _self.menu_group('Management') }}
                     <ul class="space-y-1">
-                        <li>{{ _self.menu_item('Board', current_route == 'app_user_board', 'tabler:layout-dashboard', path('app_user_board')) }}</li>
-                        <li>{{ _self.menu_item('Projects', current_route == 'app_user_projects', 'tabler:briefcase', path('app_user_projects')) }}</li>
-                        <li>{{ _self.menu_item('Tasks', false, 'tabler:checkbox', '#') }}</li>
+                        <li>{{ _self.menu_item('Board', 'tabler:layout-dashboard', 'app_user_board') }}</li>
+                        <li>{{ _self.menu_item('Tasks', 'tabler:checkbox', '#') }}</li>
+                        <li>{{ _self.menu_item('Projects', 'tabler:briefcase', 'app_user_projects') }}</li>
+                        <li>{{ _self.menu_item('Forms', 'tabler:forms', 'app_user_forms') }}</li>
                     </ul>
                 </div>
 
@@ -83,8 +85,8 @@
                 <div>
                     {{ _self.menu_group('CRM') }}
                     <ul class="space-y-1">
-                        <li>{{ _self.menu_item('Companies', current_route == 'app_user_companies', 'tabler:building-skyscraper', path('app_user_companies')) }}</li>
-                        <li>{{ _self.menu_item('Contacts', current_route == 'app_user_contacts', 'tabler:user-share', path('app_user_contacts')) }}</li>
+                        <li>{{ _self.menu_item('Companies', 'tabler:building-skyscraper', 'app_user_companies') }}</li>
+                        <li>{{ _self.menu_item('Contacts', 'tabler:user-share', 'app_user_contacts') }}</li>
                     </ul>
                 </div>
 
@@ -92,7 +94,7 @@
                 <div>
                     {{ _self.menu_group('Admin') }}
                     <ul class="space-y-1">
-                        <li>{{ _self.menu_item('Users', current_route == 'app_admin_users', 'tabler:users', path('app_admin_users')) }}</li>
+                        <li>{{ _self.menu_item('Users', 'tabler:users', 'app_admin_users') }}</li>
                     </ul>
                 </div>
             </nav>
