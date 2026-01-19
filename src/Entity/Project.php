@@ -47,11 +47,19 @@ class Project
     #[ORM\OneToMany(targetEntity: Ticket::class, mappedBy: 'project', orphanRemoval: true)]
     private Collection $tickets;
 
+    /**
+     * @var Collection<int, Document>
+     */
+    #[ORM\ManyToMany(targetEntity: Document::class)]
+    #[ORM\JoinTable(name: 'project_document')]
+    private Collection $documents;
+
     public function __construct()
     {
         $this->managers = new ArrayCollection();
         $this->companies = new ArrayCollection();
         $this->tickets = new ArrayCollection();
+        $this->documents = new ArrayCollection();
     }
 
     public static function create(
@@ -179,5 +187,31 @@ class Project
         }
 
         return $this;
+    }
+
+    /** @return Collection<int, Document> */
+    public function getDocuments(): Collection
+    {
+        return $this->documents;
+    }
+
+    public function addDocument(Document $document): self
+    {
+        if (!$this->documents->contains($document)) {
+            $this->documents->add($document);
+        }
+
+        return $this;
+    }
+
+    public function removeDocument(Document $document): self
+    {
+        $this->documents->removeElement($document);
+        return $this;
+    }
+
+    public function hasDocument(Document $document): bool
+    {
+        return $this->documents->contains($document);
     }
 }
