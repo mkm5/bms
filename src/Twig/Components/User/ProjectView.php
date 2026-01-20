@@ -2,7 +2,9 @@
 
 namespace App\Twig\Components\User;
 
+use App\Entity\Document;
 use App\Entity\Project;
+use App\Repository\DocumentRepository;
 use App\Repository\ProjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
@@ -26,6 +28,7 @@ final class ProjectView
 
     public function __construct(
         private readonly ProjectRepository $projectRepository,
+        private readonly DocumentRepository $documentRepository,
         private readonly EntityManagerInterface $em,
     ) {
     }
@@ -51,8 +54,29 @@ final class ProjectView
         $this->em->flush();
     }
 
+    #[LiveAction]
+    public function openDocumentSearch(): void
+    {
+        $this->emit('project:assignDocument', ['project' => $this->project->getId()]);
+    }
+
+    #[LiveAction]
+    public function removeDocument(#[LiveArg] int $documentId): void
+    {
+        $document = $this->documentRepository->find($documentId);
+        if ($document) {
+            $this->project->removeDocument($document);
+            $this->em->flush();
+        }
+    }
+
     public function getModalName(): string
     {
         return self::MODAL_NAME;
+    }
+
+    public function getDocumentSearchModalName(): string
+    {
+        return ProjectDocumentSearch::MODAL_NAME;
     }
 }
