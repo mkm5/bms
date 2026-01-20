@@ -1,0 +1,107 @@
+<div {{ attributes }}>
+    <div class="w-full space-y-6">
+        <div class="flex items-center gap-2 text-sm text-gray-500">
+            <a href="{{ path('app_user_documents') }}" class="hover:text-gray-900 hover:underline">Documents</a>
+            <twig:ux:icon name="tabler:chevron-right" class="w-4 h-4" />
+            <span class="text-gray-900">{{ document.name }}</span>
+        </div>
+
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-900">Document Details</h2>
+            </div>
+            <div class="p-6 space-y-6">
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500 mb-1">Name</h3>
+                    <p class="text-gray-900">{{ document.name }}</p>
+                </div>
+
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500 mb-1">Description</h3>
+                    <p class="text-gray-900 whitespace-pre-wrap">{{ document.description|default('No description provided.') }}</p>
+                </div>
+
+                {% if document.tags|length > 0 %}
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500 mb-2">Tags</h3>
+                    <div class="flex flex-wrap gap-2">
+                        {% for tag in document.tags %}
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                                {{ tag.name }}
+                            </span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-900">Version History</h2>
+            </div>
+            <div class="p-6">
+                {% if document.versions|length > 0 %}
+                <div class="relative">
+                    <div class="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+
+                    <div class="space-y-6">
+                        {% for version in document.versions %}
+                        <div class="relative flex gap-4">
+                            <div class="relative z-10 flex items-center justify-center w-8 h-8 rounded-full {{ version == document.currentVersion ? 'bg-blue-600' : 'bg-gray-300' }} shrink-0">
+                                {% if version == document.currentVersion %}
+                                    <twig:ux:icon name="tabler:check" class="w-4 h-4 text-white" />
+                                {% else %}
+                                    <span class="w-2 h-2 rounded-full bg-white"></span>
+                                {% endif %}
+                            </div>
+
+                            <div class="flex-1 pb-6">
+                                <div class="flex items-center gap-3 mb-1">
+                                    <span class="font-semibold text-gray-900">Version {{ version.versionNumber }}</span>
+                                    {% if version == document.currentVersion %}
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">Current</span>
+                                    {% endif %}
+                                </div>
+
+                                <div class="text-sm text-gray-500 mb-2">
+                                    {{ version.createdAt|date('j F Y \\a\\t G:i') }}
+                                </div>
+
+                                <div class="bg-gray-50 rounded-lg p-4 space-y-2">
+                                    <div class="flex items-center gap-2 text-sm">
+                                        <twig:ux:icon name="tabler:file" class="w-4 h-4 text-gray-400" />
+                                        <twig:Elements:Button
+                                            variant="link"
+                                            size="md"
+                                            href="{{ this.getFileLink(version) }}"
+                                            class="text-gray-700 p-0"
+                                        >
+                                            {{- version.originalFileName -}}
+                                        </twig:Elements:Button>
+                                    </div>
+                                    {% if version.mimeType %}
+                                    <div class="flex items-center gap-2 text-sm">
+                                        <twig:ux:icon name="tabler:binary" class="w-4 h-4 text-gray-400" />
+                                        <span class="text-gray-500">{{ version.mimeType }}</span>
+                                    </div>
+                                    {% endif %}
+                                    {% if version.note %}
+                                    <div class="flex items-start gap-2 text-sm mt-2 pt-2 border-t border-gray-200">
+                                        <twig:ux:icon name="tabler:note" class="w-4 h-4 text-gray-400 mt-0.5" />
+                                        <span class="text-gray-600">{{ version.note }}</span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% else %}
+                <p class="text-gray-500 text-center py-4">No versions available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

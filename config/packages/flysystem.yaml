@@ -4,9 +4,7 @@ flysystem:
             adapter: 'local'
             options:
                 directory: '%kernel.project_dir%/var/storage/default'
-            public_url: '/d/_/default'
         documents.storage:
             adapter: 'local'
             options:
                 directory: '%kernel.project_dir%/var/storage/documents'
-            public_url: '/d/_/documents'

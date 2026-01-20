@@ -1,0 +1,11 @@
+{% extends 'default_layout.html.twig' %}
+
+{% block title %}{{ document.name }} - Documents{% endblock %}
+
+{% block header_title %}Documents - {{ document.name }}{% endblock %}
+
+{% block header_extended %}{% endblock %}
+
+{% block content %}
+    <twig:User:DocumentView :document="document" />
+{% endblock %}

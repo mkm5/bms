@@ -1,0 +1,107 @@
+{% import "elements.html.twig" as c %}
+
+<div
+    class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"
+    {{ attributes }}
+>
+    <div class="px-6 py-4 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex gap-2">
+            <input
+                class="{{ c._input('w-64') }}"
+                type="text"
+                data-model="debounce(150)|search"
+                placeholder="Search..."
+            >
+        </div>
+        <twig:Elements:Button
+            data-action="live#action"
+            data-live-action-param="createDocument"
+        >
+            <twig:ux:icon name="tabler:file-plus" class="mr-2" />New Document
+        </twig:Elements:Button>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left text-gray-500">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b border-gray-200">
+                <tr>
+                    <th class="px-6 py-3 font-medium whitespace-nowrap w-16">ID</th>
+                    <th class="px-6 py-3 font-medium whitespace-nowrap">Name</th>
+                    <th class="px-6 py-3 font-medium whitespace-nowrap">Version</th>
+                    <th class="px-6 py-3 font-medium whitespace-nowrap">Original File</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {%- for document in this.documents -%}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 text-gray-500">{{ document.id }}</td>
+                    <td class="px-6 py-4 font-medium text-gray-900">
+                        <a href="{{ path('app_user_document_view', {id: document.id}) }}" class="hover:text-blue-600 hover:underline">
+                            {{ document.name }}
+                        </a>
+                    </td>
+                    <td class="px-6 py-4 text-gray-500">
+                        {% if document.currentVersion %}
+                            v{{ document.currentVersion.versionNumber }}
+                        {% else %}
+                            <span class="text-gray-400">-</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4 text-gray-500">
+                        {% if document.currentVersion %}
+                            {{ document.currentVersion.originalFileName }}
+                        {% else %}
+                            <span class="text-gray-400">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {%- else -%}
+                <tr>
+                    <td colspan="4" class="px-6 py-8 text-center text-gray-500">No documents found.</td>
+                </tr>
+                {%- endfor -%}
+            </tbody>
+        </table>
+    </div>
+
+    {% if this.totalPages > 1 %}
+    <div class="flex my-2 mx-4 justify-between items-center">
+        <twig:Elements:Button
+            variant="link"
+            size="lg"
+            data-action="live#update"
+            data-model="page"
+            data-value="{{ this.page - 1}}"
+            disabled="{{ not this.hasPreviousPage }}"
+        >Previous</twig:Elements:Button>
+
+        <div class="flex gap-1 items-center">
+            {% for pageNum in this.pageNumbers %}
+                {% if pageNum == '...' %}
+                    <span class="px-3 py-1 text-gray-400 select-none">...</span>
+                {% else %}
+                    <twig:Elements:Button
+                        data-action="live#update"
+                        data-model="page"
+                        data-value="{{ pageNum }}"
+                        variant="{{ pageNum == this.page ? 'primary' : 'link' }}"
+                        disabled="{{ pageNum == this.page }}"
+                    >{{ pageNum }}</twig:Elements:Button>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <twig:Elements:Button
+            variant="link"
+            size="lg"
+            data-action="live#update"
+            data-model="page"
+            data-value="{{ this.page + 1}}"
+            disabled="{{ not this.hasNextPage }}"
+        >Next</twig:Elements:Button>
+    </div>
+    {% endif %}
+
+    <twig:Elements:Modal name="{{ this.modalName }}">
+        <twig:User:DocumentCreate />
+    </twig:Elements:Modal>
+</div>

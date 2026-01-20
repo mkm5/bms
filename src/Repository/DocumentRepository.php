@@ -58,4 +58,27 @@ class DocumentRepository extends ServiceEntityRepository
         $params = ['query' => $query];
         return (int) $conn->executeQuery($sql, $params)->fetchOne();
     }
+
+    /** @return Document[] */
+    public function findPaginated(int $limit = 20, int $offset = 0): array
+    {
+        return $this->createQueryBuilder('d')
+            ->leftJoin('d.currentVersion', 'cv')
+            ->addSelect('cv')
+            ->orderBy('d.id', 'DESC')
+            ->setMaxResults($limit)
+            ->setFirstResult($offset)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function countAll(): int
+    {
+        return (int) $this->createQueryBuilder('d')
+            ->select('COUNT(d.id)')
+            ->getQuery()
+            ->getSingleScalarResult()
+        ;
+    }
 }

@@ -1,0 +1,15 @@
+<div {{ attributes }}>
+    <h2 class="text-xl font-semibold text-gray-900 mb-4">
+        New Document
+    </h2>
+
+    {{ form_start(form, {attr: {
+        'data-action': 'live#action',
+        'data-live-action-param': 'prevent|files|save'
+    }}) }}
+        {{ form_row(form.name) }}
+        {{ form_row(form.description) }}
+        {{ form_row(form.file) }}
+        <twig:Elements:Button type="submit" class="mt-6">Save</twig:Elements:Button>
+    {{ form_end(form) }}
+</div>

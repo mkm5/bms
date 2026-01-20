@@ -90,6 +90,11 @@ class File
         return $this->storage;
     }
 
+    public function getStorageId(): int
+    {
+        return $this->storage->value;
+    }
+
     public function getStorageName(): string
     {
         return $this->storage->storageName();
