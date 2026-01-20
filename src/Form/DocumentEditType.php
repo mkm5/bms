@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Document;
+use App\Form\Autocomplete\TagAutocompleteField;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -20,6 +21,10 @@ class DocumentEditType extends AbstractType
             ])
             ->add('description', TextareaType::class, [
                 'label' => 'Description',
+                'required' => false,
+            ])
+            ->add('tags', TagAutocompleteField::class, [
+                'label' => 'Tags',
                 'required' => false,
             ])
         ;

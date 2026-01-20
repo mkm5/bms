@@ -73,6 +73,10 @@ final class DocumentCreate extends AbstractController
         $document = Document::create($data['name'], $data['description']);
         DocumentVersion::create($document, $file);
 
+        foreach ($data['tags'] ?? [] as $tag) {
+            $document->addTag($tag);
+        }
+
         $this->em->persist($document);
         $this->em->flush();
 
