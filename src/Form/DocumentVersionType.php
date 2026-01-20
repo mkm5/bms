@@ -1,0 +1,52 @@
+<?php declare(strict_types=1);
+
+namespace App\Form;
+
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints as Assert;
+
+class DocumentVersionType extends AbstractType
+{
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $builder
+            ->add('file', FileType::class, [
+                'label' => 'File',
+                'required' => true,
+                'constraints' => [
+                    new Assert\NotBlank(
+                        message: 'File is required',
+                        groups: ['files'],
+                    ),
+                    new Assert\File(
+                        maxSize: '10M',
+                        extensions: ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'jpg', 'jpeg', 'png', 'gif', 'webp'],
+                        maxSizeMessage: 'The file is too large. Maximum allowed size is 10 MB.',
+                        extensionsMessage: 'Please upload a valid document (PDF, Word, Excel) or image (JPEG, PNG, GIF, WebP).',
+                        groups: ['files'],
+                    ),
+                ],
+            ])
+            ->add('note', TextareaType::class, [
+                'label' => 'Note',
+                'required' => false,
+                'attr' => [
+                    'placeholder' => 'Add a note about this version (optional)',
+                    'rows' => 3,
+                ],
+            ])
+        ;
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'csrf_protection' => true,
+            'validation_groups' => ['Default', 'files'],
+        ]);
+    }
+}

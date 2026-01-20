@@ -1,0 +1,12 @@
+<div {{ attributes }}>
+    <h2 class="text-xl font-semibold text-gray-900 mb-4">Upload New Version</h2>
+
+    {{ form_start(form, {attr: {
+        'data-action': 'live#action',
+        'data-live-action-param': 'prevent|files|save'
+    }}) }}
+        {{ form_row(form.file) }}
+        {{ form_row(form.note) }}
+        <twig:Elements:Button type="submit">Upload</twig:Elements:Button>
+    {{ form_end(form) }}
+</div>

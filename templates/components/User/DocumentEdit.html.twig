@@ -1,0 +1,12 @@
+<div {{ attributes }}>
+    <h2 class="text-xl font-semibold text-gray-900 mb-4">Edit Document</h2>
+
+    {{ form_start(form, {attr: {
+        'data-action': 'live#action:prevent',
+        'data-live-action-param': 'save'
+    }}) }}
+        {{ form_row(form.name) }}
+        {{ form_row(form.description) }}
+        <twig:Elements:Button type="submit" class="mt-6">Save Changes</twig:Elements:Button>
+    {{ form_end(form) }}
+</div>

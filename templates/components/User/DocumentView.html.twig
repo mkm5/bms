@@ -7,8 +7,16 @@
         </div>
 
         <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200">
+            <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
                 <h2 class="text-lg font-semibold text-gray-900">Document Details</h2>
+                <twig:Elements:Button
+                    variant="secondary"
+                    size="sm"
+                    data-action="live#action"
+                    data-live-action-param="editDocument"
+                >
+                    <twig:ux:icon name="tabler:edit" class="w-4 h-4 mr-1" />Edit
+                </twig:Elements:Button>
             </div>
             <div class="p-6 space-y-6">
                 <div>
@@ -37,8 +45,15 @@
         </div>
 
         <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200">
+            <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
                 <h2 class="text-lg font-semibold text-gray-900">Version History</h2>
+                <twig:Elements:Button
+                    size="sm"
+                    data-action="live#action"
+                    data-live-action-param="uploadVersion"
+                >
+                    <twig:ux:icon name="tabler:upload" class="w-4 h-4 mr-1" />Upload New Version
+                </twig:Elements:Button>
             </div>
             <div class="p-6">
                 {% if document.versions|length > 0 %}
@@ -104,4 +119,12 @@
             </div>
         </div>
     </div>
+
+    <twig:Elements:Modal name="{{ this.editModalName }}">
+        <twig:User:DocumentEdit />
+    </twig:Elements:Modal>
+
+    <twig:Elements:Modal name="{{ this.versionModalName }}">
+        <twig:User:DocumentVersionUpload />
+    </twig:Elements:Modal>
 </div>
