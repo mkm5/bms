@@ -11,6 +11,8 @@ use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Uid\Uuid;
 
+use function Symfony\Component\String\u;
+
 #[ORM\Entity(repositoryClass: FileRepository::class)]
 #[ORM\Index(name: 'IDX_FILE_STORAGE', columns: ['storage'])]
 #[ORM\UniqueConstraint(name: 'FILE_UNIQ_PUBLIC_ID', fields: ['publicId'])]
@@ -109,6 +111,11 @@ class File
     public function getOriginalFileName(): string
     {
         return $this->originalFileName;
+    }
+
+    public function getOriginalFileNameAsciiOnly(): string
+    {
+        return u($this->originalFileName)->ascii()->toString();
     }
 
     public function setOriginalFileName(string $originalFileName): self

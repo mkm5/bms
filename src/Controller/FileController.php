@@ -14,6 +14,8 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
 
+use function Symfony\Component\String\u;
+
 class FileController extends AbstractController
 {
     public function __construct(
@@ -23,7 +25,7 @@ class FileController extends AbstractController
     }
 
     #[Route('/d/{storageId:file.storage}/{publicId:file.publicId}', name: 'app_file')]
-    public function __invoke(File $file, Request $request): StreamedResponse
+    public function __invoke(File $file, Request $request): Response
     {
         if (!$this->storages->has($file->getStorageName())) {
             throw $this->createNotFoundException('Storage not found');
@@ -62,6 +64,7 @@ class FileController extends AbstractController
         $response->headers->set('Content-Disposition', HeaderUtils::makeDisposition(
             ResponseHeaderBag::DISPOSITION_INLINE,
             $file->getOriginalFileName(),
+            $file->getOriginalFileNameAsciiOnly(),
         ));
         $response->headers->set('Content-Length', (string) $storage->fileSize($file->getPublicName())->fileSize());
         return $response;
