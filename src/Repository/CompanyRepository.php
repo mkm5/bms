@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Repository;
 
@@ -27,16 +25,25 @@ class CompanyRepository extends ServiceEntityRepository
         int $offset = 0,
     ): array {
         $qb = $this->createQueryBuilder('c')
-            ->orderBy('c.id', 'DESC');
+            ->orderBy('c.id', 'DESC')
+        ;
 
         if ($search !== null && $search !== '') {
-            $qb->andWhere('LOWER(c.name) LIKE LOWER(:search)')
-                ->setParameter('search', '%' . $search . '%');
+
+            $qb->andWhere(
+                    $qb->expr()->orX(
+                        $qb->expr()->like('LOWER(c.name)', 'LOWER(:search)'),
+                        $qb->expr()->like('LOWER(c.address)', 'LOWER(:search)')
+                    )
+                )
+                ->setParameter('search', '%' . $search . '%')
+            ;
         }
 
         if ($limit !== null) {
             $qb->setMaxResults($limit)
-                ->setFirstResult($offset);
+                ->setFirstResult($offset)
+            ;
         }
 
         return $qb->getQuery()->getResult();

@@ -22,6 +22,20 @@
                     <p class="text-gray-900">{{ company.name }}</p>
                 </div>
 
+                {% if company.address %}
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500 mb-1">Address</h3>
+                    <p class="text-gray-900">{{ company.address }}</p>
+                </div>
+                {% endif %}
+
+                {%  if company.note %}
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500 mb-1">Note</h3>
+                    <p class="text-gray-900">{{ company.note }}</p>
+                </div>
+                {% endif %}
+
                 <div>
                     <h3 class="text-sm font-medium text-gray-500 mb-2">Contacts</h3>
                     {% if company.contacts|length > 0 %}
