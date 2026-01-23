@@ -5,6 +5,7 @@ namespace App\Twig\Components\User;
 use App\Entity\Ticket;
 use App\Entity\TicketTask;
 use App\Form\TicketType;
+use App\Repository\TagRepository;
 use App\Repository\TicketRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -34,7 +35,11 @@ final class TicketViewEdit extends AbstractController
     #[LiveProp]
     public ?Ticket $viewTicket = null;
 
+    #[LiveProp]
+    public string $tagCreateModalName = 'tag-create';
+
     public function __construct(
+        private readonly TagRepository $tagRepository,
         private readonly TicketRepository $ticketRepository,
         private readonly EntityManagerInterface $em,
     ) {
@@ -130,5 +135,22 @@ final class TicketViewEdit extends AbstractController
                 $this->resetForm();
             }
         }
+    }
+
+    #[LiveListener('tag:created')]
+    public function onTagCreated(#[LiveArg] int $tag): void
+    {
+        if (!($tag = $this->tagRepository->find($tag))) {
+            return;
+        }
+
+        $this->viewTicket->addTag($tag);
+
+        $currentTags = $this->formValues['tags'] ?? [];
+        if (!in_array($tag, $currentTags)) {
+            $this->formValues['tags'][] = $tag;
+        }
+
+        $this->resetForm();
     }
 }
