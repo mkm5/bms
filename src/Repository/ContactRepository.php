@@ -27,16 +27,26 @@ class ContactRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('c')
             ->leftJoin('c.company', 'company')
             ->addSelect('company')
-            ->orderBy('c.id', 'DESC');
+            ->orderBy('c.id', 'DESC')
+        ;
 
         if ($search !== null && $search !== '') {
-            $qb->andWhere('LOWER(c.firstName) LIKE LOWER(:search) OR LOWER(c.lastName) LIKE LOWER(:search) OR LOWER(company.name) LIKE LOWER(:search)')
-                ->setParameter('search', '%' . $search . '%');
+            $qb->andWhere(
+                    $qb->expr()->orX(
+                        $qb->expr()->like('c.firstName', ':search'),
+                        $qb->expr()->like('c.lastName', ':search'),
+                        $qb->expr()->like('c.address', ':search'),
+                        $qb->expr()->like('company.name', ':search'),
+                    )
+                )
+                ->setParameter('search', '%'.$search.'%')
+            ;
         }
 
         if ($limit !== null) {
             $qb->setMaxResults($limit)
-                ->setFirstResult($offset);
+                ->setFirstResult($offset)
+            ;
         }
 
         return $qb->getQuery()->getResult();

@@ -6,6 +6,7 @@ use App\Entity\Contact;
 use App\Form\Autocomplete\CompanyAutocompleteField;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -23,9 +24,20 @@ class ContactType extends AbstractType
                 'label' => 'Last Name',
                 'required' => true,
             ])
+            ->add('address', TextType::class, [
+                'lable' => 'Address',
+                'required' => false,
+            ])
             ->add('company', CompanyAutocompleteField::class, [
                 'label' => 'Company',
                 'required' => false,
+            ])
+            ->add('note', TextareaType::class, [
+                'label' => 'Note',
+                'required' => false,
+                'attr' => [
+                    'rows' => 3,
+                ],
             ])
             ->add('communcationChannels', CollectionType::class, [
                 'entry_type' => CommunicationChannelType::class,
