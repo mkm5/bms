@@ -45,7 +45,6 @@ final class DocumentVersionUpload extends AbstractController
 
     protected function instantiateForm(): FormInterface
     {
-        // dd($_FILES, $this->validationGroups());
         return $this->createForm(DocumentVersionType::class, options: [
             'validation_groups' => ['Default', 'files'],
         ]);

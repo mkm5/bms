@@ -48,9 +48,6 @@ final class LoginController extends AbstractController
                 new Response(status: Response::HTTP_SEE_OTHER),
             );
         }
-
-        dd($form->getErrors());
-
         return $this->redirectToRoute('app_user_login');
     }
 
