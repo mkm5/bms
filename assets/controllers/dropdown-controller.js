@@ -39,7 +39,7 @@ export default class extends Controller {
         menu.style.visibility = '';
 
         menu.style.top = `${rect.bottom + 4}px`;
-        menu.style.left = `${rect.right - menuWidth}px`;
+        menu.style.left = `${Math.max(0, rect.right - menuWidth)}px`;
     }
 
     clickOutside(event) {

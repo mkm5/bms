@@ -12,8 +12,8 @@
 ) -%}
 
 <div
-    class="relative inline-block text-left"
-    data-controller="dropdown"
+    class="{{ ('relative inline-block text-left ' ~ attributes.render('class'))|tailwind_merge }}"
+    {{ attributes.defaults({'data-controller': 'dropdown'}) }}
 >
     <button
         type="button"
