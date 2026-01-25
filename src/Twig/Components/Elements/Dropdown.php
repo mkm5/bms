@@ -7,4 +7,6 @@ use Symfony\UX\TwigComponent\Attribute\AsTwigComponent;
 #[AsTwigComponent]
 class Dropdown
 {
+    /** @var 'long'|'short' */
+    public string $variant = 'long';
 }

@@ -30,7 +30,7 @@ final class DocumentCreate extends AbstractController
     use DefaultActionTrait;
 
     #[LiveProp]
-    public string $modalName = 'document';
+    public string $modalName;
 
     public function __construct(
         private readonly ValidatorInterface $validator,

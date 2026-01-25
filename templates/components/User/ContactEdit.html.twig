@@ -12,7 +12,9 @@
         {% do form.communcationChannels.setRendered %}
         {{ form_row(form.firstName) }}
         {{ form_row(form.lastName) }}
+        {{ form_row(form.address) }}
         {{ form_row(form.company) }}
+        {{ form_row(form.note) }}
 
         <div class="mt-4">
             <label class="font-sans antialiased text-sm text-stone-800 font-semibold">Communication Channels</label>
@@ -50,6 +52,6 @@
             </button>
         </div>
 
-        <twig:Elements:Button type="submit" class="mt-6">Save</twig:Elements:Button>
+        <twig:Elements:Button type="submit">Save</twig:Elements:Button>
     {{ form_end(form) }}
 </div>

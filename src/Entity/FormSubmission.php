@@ -26,11 +26,11 @@ class FormSubmission
     #[ORM\Column(
         type: Types::TEXT,
         nullable: true,
-        columnDefinition: 'tsvector',
         insertable: false,
         updatable: false,
+        generated: 'ALWAYS'
     )]
-    private $searchData = null;
+    private ?string $searchData = null;
 
     #[ORM\Column]
     private DateTimeImmutable $submittedAt;

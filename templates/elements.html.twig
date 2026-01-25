@@ -22,3 +22,13 @@
     {%- set base = 'inline-flex items-center gap-2' -%}
     {{ (base ~ ' ' ~ classes)|tailwind_merge }}
 {%- endmacro _checkbox_container -%}
+
+{%- macro _table_head(classes='') -%}
+    {%- set base = 'px-6 py-3 font-medium whitespace-nowrap' -%}
+    {{ (base ~ ' ' ~ classes)|tailwind_merge }}
+{%- endmacro -%}
+
+{%- macro _table_column(classes='') -%}
+    {%- set base = 'px-6 py-4 text-gray-500' -%}
+    {{ (base ~ ' ' ~ classes)|tailwind_merge }}
+{%- endmacro -%}

@@ -9,8 +9,9 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<Project>
+ * @implements SearchableRepository<Project>
  */
-class ProjectRepository extends ServiceEntityRepository
+class ProjectRepository extends ServiceEntityRepository implements SearchableRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
@@ -20,53 +21,56 @@ class ProjectRepository extends ServiceEntityRepository
     /**
      * @return Project[]
      */
-    public function search(
-        ?string $search = null,
-        bool $onlyFinished = false,
-        ?int $limit = null,
-        int $offset = 0,
-    ): array
+    public function search(?string $query = null, array $params = [], ?int $limit = null, int $offset = 0): array
     {
-        $qb = $this->createQueryBuilder('p');
+        $ids = $this->buildSearchQuery($query, $params, $limit, $offset)
+            ->select('p.id')
+            ->orderBy('p.id', 'DESC')
+            ->getQuery()
+            ->getResult()
+        ;
 
-        $this->applyListingSearchFilters($qb, $search, $onlyFinished);
-
-        $qb->orderBy('p.id', 'DESC');
-
-        if ($limit !== null) $qb->setMaxResults($limit);
-        if ($offset > 0) $qb->setFirstResult($offset);
-
-        return $qb->getQuery()->getResult();
+        return $this->buildSearchQuery($query, $params, $limit, $offset)
+            ->join('p.managers', 'm')
+            ->addSelect('m')
+            ->andWhere('p.id in (:ids)')
+            ->setParameter('ids', $ids)
+            ->orderBy('p.id', 'DESC')
+            ->getQuery()
+            ->getResult()
+        ;
     }
 
-    public function countSearch(
-        ?string $search = null,
-        bool $onlyFinished = false,
-    ): int
+    public function searchCount(?string $query = null, array $params = []): int
     {
-        $qb = $this->createQueryBuilder('p')->select('COUNT(p.id)');
-        $this->applyListingSearchFilters($qb, $search, $onlyFinished);
-        return (int) $qb->getQuery()->getSingleScalarResult();
+        return (int) $this->buildSearchQuery($query, $params)
+            ->select('COUNT(p.id)')
+            ->getQuery()
+            ->getSingleColumnResult()
+        ;
     }
 
-    private function applyListingSearchFilters(
-        QueryBuilder $qb,
-        ?string $search,
-        bool $onlyFinished,
-    ): void
+    private function buildSearchQuery(?string $query = null, array $params = [], ?int $limit = null, int $offset = 0): QueryBuilder
     {
-        if (!empty($search)) {
+        $qb = $this->createQueryBuilder('p')
+            ->setMaxResults($limit)
+            ->setFirstResult($limit ? $offset : null)
+        ;
+
+        if (!empty($query)) {
             $qb
-                ->andWhere('LOWER(p.name) LIKE :search')
-                ->setParameter('search', '%' . strtolower($search) . '%')
+                ->andWhere('LOWER(p.name) LIKE :query')
+                ->setParameter('query', '%' . strtolower($query) . '%')
             ;
         }
 
-        if ($onlyFinished) {
+        if (!empty($params['onlyFinished']) && $params['onlyFinished']) {
             $qb
                 ->andWhere('p.isFinished = :isFinished')
                 ->setParameter('isFinished', true)
             ;
         }
+
+        return $qb;
     }
 }

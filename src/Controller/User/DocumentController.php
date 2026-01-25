@@ -12,7 +12,12 @@ final class DocumentController extends AbstractController
     #[Route('/documents', name: 'app_user_documents')]
     public function index(): Response
     {
-        return $this->render('user/documents.html.twig');
+        return $this->render('listings/listing.html.twig', [
+            'title' => 'Document',
+            'headerTitle' => 'Document',
+            'listing' => '_documents.html.twig',
+            'entityClassName' => Document::class,
+        ]);
     }
 
     #[Route('/documents/{id}', name: 'app_user_document_view')]

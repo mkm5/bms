@@ -25,7 +25,7 @@ final class CompanyEdit extends AbstractController
     use DefaultActionTrait;
 
     #[LiveProp]
-    public string $editModalName = 'company';
+    public string $modalName;
 
     #[LiveProp]
     public ?Company $viewCompany = null;
@@ -52,8 +52,9 @@ final class CompanyEdit extends AbstractController
         $this->em->persist($company);
         $this->em->flush();
 
-        $this->dispatchBrowserEvent('modal:close', ['id' => $this->editModalName]);
+        $this->dispatchBrowserEvent('modal:close', ['id' => $this->modalName]);
         $this->emit('company:update', ['company' => $company->getId()]);
+        $this->emit('listing:refresh');
         $this->viewCompany = null;
         $this->resetForm();
     }
@@ -70,7 +71,7 @@ final class CompanyEdit extends AbstractController
             throw new \ValueError('Company with id "' . ($company) . '" does not exist');
         }
 
-        $this->dispatchBrowserEvent('modal:open', ['id' => $this->editModalName]);
+        $this->dispatchBrowserEvent('modal:open', ['id' => $this->modalName]);
         $this->resetForm();
     }
 }

@@ -1,0 +1,44 @@
+{#
+    Reusable pagination controls.
+
+    Expects the component to have:
+    - this.page (current page)
+    - this.hasPreviousPage
+    - this.hasNextPage
+    - this.pageNumbers
+#}
+<div class="flex my-2 mx-4 justify-between items-center">
+    <twig:Elements:Button
+        variant="link"
+        size="lg"
+        data-action="live#update"
+        data-model="page"
+        data-value="{{ this.page - 1 }}"
+        disabled="{{ not this.hasPreviousPage }}"
+    >Previous</twig:Elements:Button>
+
+    <div class="flex gap-1 items-center">
+        {% for pageNum in this.pageNumbers %}
+            {% if pageNum is null %}
+                <span class="px-3 py-1 text-gray-400 select-none">...</span>
+            {% else %}
+                <twig:Elements:Button
+                    data-action="live#update"
+                    data-model="page"
+                    data-value="{{ pageNum }}"
+                    variant="{{ pageNum == this.page ? 'primary' : 'link' }}"
+                    disabled="{{ pageNum == this.page }}"
+                >{{ pageNum }}</twig:Elements:Button>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <twig:Elements:Button
+        variant="link"
+        size="lg"
+        data-action="live#update"
+        data-model="page"
+        data-value="{{ this.page + 1 }}"
+        disabled="{{ not this.hasNextPage }}"
+    >Next</twig:Elements:Button>
+</div>

@@ -1,0 +1,94 @@
+<twig:Admin:UsersListing entityClassName="{{ entityClassName }}"  {{ ...(usersListingProps ?? {}) }}>
+    <twig:block name="filters">
+        <twig:Elements:Dropdown>
+            <twig:block name="header">Categories</twig:block>
+            {% import "elements.html.twig" as c %}
+            <div class="{{ c._checkbox_container_block() }}">
+                <input
+                    id="onlyActiveUsers"
+                    type="checkbox"
+                    class="{{ c._checkbox() }}"
+                    data-model="params[]"
+                    value="onlyActive"
+                    {% if outerScope.this.hasParam('onlyActive') %}checked=""{% endif %}
+                >
+                <label for="onlyActiveUsers" class="{{ c._label() }}">Active only</label>
+            </div>
+
+            <div class="{{ c._checkbox_container_block() }}">
+                <input
+                    id="onlyAdmins"
+                    type="checkbox"
+                    class="{{ c._checkbox() }}"
+                    data-model="params[]"
+                    value="onlyAdmins"
+                    {% if outerScope.this.hasParam('onlyAdmins') %}checked=""{% endif %}
+                >
+                <label for="onlyAdmins" class="{{ c._label() }}">Admins only</label>
+            </div>
+        </twig:Elements:Dropdown>
+    </twig:block>
+
+    <twig:block name="headers_action_right">
+        <twig:Elements:Button data-action="live#emit" data-live-event-param="user:edit">
+            <twig:ux:icon name="tabler:users" class="mr-2"/>New User
+        </twig:Elements:Button>
+    </twig:block>
+    <twig:block name="table_head">
+        <twig:Elements:Th>Name</twig:Elements:Th>
+        <twig:Elements:Th>Position</twig:Elements:Th>
+        <twig:Elements:Th>Status</twig:Elements:Th>
+        <twig:Elements:Th>Role</twig:Elements:Th>
+        <twig:Elements:Th class="text-right whitespace-nowrap w-8">Actions</twig:Elements:Th>
+    </twig:block>
+    <twig:block name="table_row">
+        <twig:Elements:Td class="text-gray-900">
+            <div>{{ item.firstName }} {{ item.lastName }}</div>
+            <div class="text-gray-400">{{ item.email }}</div>
+        </twig:Elements:Td>
+        <twig:Elements:Td>{{ item.position }}</twig:Elements:Td>
+        <twig:Elements:Td class="text-center">
+            <twig:Elements:Pill
+                variant="{{ item.isActive ? 'default' : 'disabled' }}"
+                content="{{ item.isActive ? 'Active' : 'Inactive' }}"
+            />
+        </twig:Elements:Td>
+        <twig:Elements:Td class="text-center">{{- item.isAdmin ? 'Admin' : 'User' -}}</twig:Elements:Td>
+        <twig:Elements:Td class="text-gray-900 whitespace-nowrap text-right">
+            <twig:Elements:Dropdown variant='short'>
+                <twig:Elements:DropdownButton
+                    data-action="live#emit"
+                    data-live-event-param="user:edit"
+                    data-live-user-param="{{ item.id }}"
+                >
+                    <twig:ux:icon name="tabler:pencil" class="w-4 h-4" /> Edit
+                </twig:Elements:DropdownButton>
+
+                {%- if not item.isActive and not item.isRegistered -%}
+                    <twig:Elements:DropdownButton
+                        data-action="live#emit"
+                        data-live-event-param="user:resend-registration-link"
+                        data-live-user-param="{{ item.id }}"
+                    >
+                        <twig:ux:icon name="tabler:mail" class="w-4 h-4" /> Resend registration link
+                    </twig:Elements:DropdownButton>
+                {%- endif -%}
+
+                <twig:Elements:DropdownButton
+                    data-action="live#emit"
+                    data-live-event-param="user:toggle-status"
+                    data-live-user-param="{{ item.id }}"
+                >
+                    {%- set icon = item.isActive ? 'tabler:user-off' : 'tabler:user-share' -%}
+                    {%- set text = item.isActive ? 'Deactivate user' : 'Activate user' -%}
+                    <twig:ux:icon name="{{ icon }}" class="w-4 h-4" /> {{ text }}
+                </twig:Elements:DropdownButton>
+            </twig:Elements:Dropdown>
+        </twig:Elements:Td>
+    </twig:block>
+    <twig:block name="post_table">
+        <twig:Elements:Modal name="user">
+            <twig:Admin:UserEdit modalName="user"/>
+        </twig:Elements:Modal>
+    </twig:block>
+</twig:Admin:UsersListing>

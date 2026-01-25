@@ -25,7 +25,7 @@ final class ProjectEdit extends AbstractController
     use DefaultActionTrait;
 
     #[LiveProp]
-    public string $editModalName = 'project';
+    public string $modalName;
 
     #[LiveProp]
     public ?Project $viewProject = null;
@@ -52,7 +52,7 @@ final class ProjectEdit extends AbstractController
         $this->em->persist($project);
         $this->em->flush();
 
-        $this->dispatchBrowserEvent('modal:close', ['id' => $this->editModalName]);
+        $this->dispatchBrowserEvent('modal:close', ['id' => $this->modalName]);
         $this->emit('project:update', ['project' => $project->getId()]);
         $this->viewProject = null;
         $this->resetForm();
@@ -70,7 +70,7 @@ final class ProjectEdit extends AbstractController
             throw new \ValueError('Project with id "'.($project).'" does not exist');
         }
 
-        $this->dispatchBrowserEvent('modal:open', ['id' => $this->editModalName]);
+        $this->dispatchBrowserEvent('modal:open', ['id' => $this->modalName]);
         $this->resetForm();
     }
 }

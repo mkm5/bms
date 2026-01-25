@@ -12,8 +12,9 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 
 /**
  * @extends ServiceEntityRepository<User>
+ * @implements SearchableRepository<User>
  */
-class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
+class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface, SearchableRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
@@ -36,73 +37,55 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $this->findOneBy(['email' => $email, 'isActive' => true]);
     }
 
-    /**
-     * @return User[]
-     */
-    public function search(
-        ?string $search = null,
-        bool $onlyActive = false,
-        bool $onlyAdmins = false,
-        ?int $limit = null,
-        int $offset = 0,
-    ): array
+    /** @return User[] */
+    public function search(?string $query = null, array $params = [], ?int $limit = null, int $offset = 0): array
     {
-        $qb = $this->createQueryBuilder('u');
-
-        $this->applyListingSearchFilters($qb, $search, $onlyActive, $onlyAdmins);
-
-        $qb->orderBy('u.id', 'DESC');
-
-        if ($limit !== null) $qb->setMaxResults($limit);
-        if ($offset > 0) $qb->setFirstResult($offset);
-
-        return $qb->getQuery()->getResult();
+        return $this->buildSearchQuery($query, $params, $limit, $offset)
+            ->orderBy('u.id', 'DESC')
+            ->getQuery()
+            ->getResult()
+        ;
     }
 
-    public function countSearch(
-        ?string $search = null,
-        bool $onlyActive = false,
-        bool $onlyAdmins = false,
-    ): int
+    public function searchCount(?string $query = null, array $params = []): int
     {
-        $qb = $this->createQueryBuilder('u')->select('COUNT(u.id)');
-        $this->applyListingSearchFilters($qb, $search, $onlyActive, $onlyAdmins);
-        return (int) $qb->getQuery()->getSingleScalarResult();
+        return (int) $this->buildSearchQuery($query, $params)
+            ->select('COUNT(u.id)')
+            ->getQuery()
+            ->getSingleScalarResult()
+        ;
     }
 
-    private function applyListingSearchFilters(
-        QueryBuilder $qb,
-        ?string $search,
-        bool $onlyActive,
-        bool $onlyAdmins,
-    ): void
+    private function buildSearchQuery(?string $query = null, array $params = [], ?int $limit = null, int $offset = 0): QueryBuilder
     {
-        if (!empty($search)) {
-            $qb
-                ->andWhere(
+        $qb = $this->createQueryBuilder('u')
+            ->setMaxResults($limit)
+            ->setFirstResult($limit ? $offset : null)
+        ;
+
+        if (in_array('onlyActive', $params)) {
+            $qb->andWhere('u.isActive = true');
+        }
+
+        if (in_array('onlyAdmins', $params)) {
+            $qb->andWhere('JSONB_CONTAINS(u.roles, :adminRole) = true')
+                ->setParameter('adminRole', '"'.User::ADMIN_ROLE.'"')
+            ;
+        }
+
+        if (!empty($query)) {
+            $qb->andWhere(
                     $qb->expr()->orX(
-                        $qb->expr()->like('LOWER(u.firstName)', ':search'),
-                        $qb->expr()->like('LOWER(u.lastName)', ':search'),
-                        $qb->expr()->like('LOWER(u.position)', ':search'),
-                        $qb->expr()->like('LOWER(u.email)', ':search')
+                        $qb->expr()->like('LOWER(u.firstName)', 'LOWER(:query)'),
+                        $qb->expr()->like('LOWER(u.lastName)', 'LOWER(:query)'),
+                        $qb->expr()->like('LOWER(u.position)', 'LOWER(:query)'),
+                        $qb->expr()->like('LOWER(u.email)', 'LOWER(:query)')
                     )
                 )
-                ->setParameter('search', '%' . strtolower($search) . '%')
+                ->setParameter('query', '%'.$query.'%')
             ;
         }
 
-        if ($onlyActive) {
-            $qb
-                ->andWhere('u.isActive = :isActive')
-                ->setParameter('isActive', true)
-            ;
-        }
-
-        if ($onlyAdmins) {
-            $qb
-                ->andWhere('JSONB_CONTAINS(u.roles, :adminRole) = true')
-                ->setParameter('adminRole', '"' . User::ADMIN_ROLE . '"')
-            ;
-        }
+        return $qb;
     }
 }

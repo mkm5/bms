@@ -1,0 +1,15 @@
+<div {{ attributes }}>
+    <h2 class="text-xl font-semibold text-gray-900 mb-4">
+        {{ viewUser is not null and viewUser.id is not empty ? 'Edit User' : 'New User' }}
+    </h2>
+
+    {{ form_start(form, {
+        attr: {
+            'data-action': 'live#action:prevent',
+            'data-live-action-param': 'save'
+        }
+    }) }}
+        {{ form_row(form) }}
+        <twig:Elements:Button type="submit">Save</twig:Elements:Button>
+    {{ form_end(form) }}
+</div>

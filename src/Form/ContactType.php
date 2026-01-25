@@ -25,7 +25,7 @@ class ContactType extends AbstractType
                 'required' => true,
             ])
             ->add('address', TextType::class, [
-                'lable' => 'Address',
+                'label' => 'Address',
                 'required' => false,
             ])
             ->add('company', CompanyAutocompleteField::class, [

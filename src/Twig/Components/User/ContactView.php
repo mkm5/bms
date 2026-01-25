@@ -6,7 +6,6 @@ use App\Entity\Contact;
 use App\Repository\ContactRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
-use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveArg;
 use Symfony\UX\LiveComponent\Attribute\LiveListener;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
@@ -36,16 +35,5 @@ final class ContactView
         if ($contact && $this->contact->getId() === $contact) {
             $this->contact = $this->contactRepository->find($contact);
         }
-    }
-
-    #[LiveAction]
-    public function editContact(): void
-    {
-        $this->emit('contact:edit', ['contact' => $this->contact->getId()]);
-    }
-
-    public function getModalName(): string
-    {
-        return self::MODAL_NAME;
     }
 }

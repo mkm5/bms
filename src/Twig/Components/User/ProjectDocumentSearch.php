@@ -21,7 +21,8 @@ final class ProjectDocumentSearch
     use ComponentToolsTrait;
     use DefaultActionTrait;
 
-    public const MODAL_NAME = 'project-document-search';
+    #[LiveProp]
+    public string $modalName;
 
     #[LiveProp(writable: true)]
     public string $search = '';
@@ -36,12 +37,12 @@ final class ProjectDocumentSearch
     ) {
     }
 
-    #[LiveListener('project:assignDocument')]
+    #[LiveListener('project:assign-document')]
     public function onOpenModal(#[LiveArg] int $project): void
     {
         $this->project = $this->projectRepository->find($project);
         $this->search = '';
-        $this->dispatchBrowserEvent('modal:open', ['id' => self::MODAL_NAME]);
+        $this->dispatchBrowserEvent('modal:open', ['id' => $this->modalName]);
     }
 
     #[LiveAction]
@@ -59,7 +60,7 @@ final class ProjectDocumentSearch
         $this->project->addDocument($document);
         $this->em->flush();
 
-        $this->dispatchBrowserEvent('modal:close', ['id' => self::MODAL_NAME]);
+        $this->dispatchBrowserEvent('modal:close', ['id' => $this->modalName]);
         $this->emit('project:update', ['project' => $this->project->getId()]);
     }
 
@@ -68,19 +69,6 @@ final class ProjectDocumentSearch
      */
     public function getDocuments(): array
     {
-        if (empty(trim($this->search))) {
-            return $this->documentRepository->findPaginated(limit: 10, offset: 0);
-        }
-
-        return $this->documentRepository->search(
-            query: $this->search,
-            limit: 10,
-            offset: 0,
-        );
-    }
-
-    public function getModalName(): string
-    {
-        return self::MODAL_NAME;
+        return $this->documentRepository->search(query: trim($this->search), limit: 10, offset: 0);
     }
 }

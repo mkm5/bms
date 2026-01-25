@@ -2,67 +2,80 @@
 
 namespace App\Repository;
 
+use App\DTO\FormWithStatistics;
 use App\Entity\FormDefinition;
-use App\Entity\Project;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
-/** @extends ServiceEntityRepository<FormDefinition> */
-class FormDefinitionRepository extends ServiceEntityRepository
+/**
+ * @extends ServiceEntityRepository<FormDefinition>
+ * @implements SearchableRepository<FormDefinition>
+ */
+class FormDefinitionRepository extends ServiceEntityRepository implements SearchableRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        private readonly FormFieldRepository $formFieldRepository,
+        private readonly FormSubmissionRepository $formSubmissionRepository,
+    ) {
         parent::__construct($registry, FormDefinition::class);
     }
 
-    /**
-     * @return FormDefinition[]
-     */
-    public function search(
-        ?string $search = null,
-        ?Project $project = null,
-        ?int $limit = null,
-        int $offset = 0,
-    ): array {
-        $qb = $this->createQueryBuilder('f')
-            ->leftJoin('f.project', 'project')
-            ->addSelect('project')
-            ->orderBy('f.id', 'DESC');
+    /** @return FormWithStatistics[] */
+    public function search(?string $query = null, array $params = [], ?int $limit = null, int $offset = 0): array
+    {
+        $forms = $this->buildSearchQuery($query, $params, $limit, $offset)
+            ->leftJoin('f.project', 'p')
+            ->addSelect('p')
+            ->orderBy('f.id', 'DESC')
+            ->getQuery()
+            ->getResult()
+        ;
 
-        if ($search !== null && $search !== '') {
-            $qb->andWhere('LOWER(f.name) LIKE LOWER(:search)')
-                ->setParameter('search', '%' . $search . '%');
-        }
 
-        if ($project !== null) {
-            $qb->andWhere('f.project = :project')
-                ->setParameter('project', $project);
-        }
+        $formsIds = array_map(fn(FormDefinition $f) => $f->getId(), $forms);
+        $fieldsByForms = $this->formFieldRepository->countByForms($formsIds);
+        $submissionsByForms = $this->formSubmissionRepository->countByForms($formsIds);
 
-        if ($limit !== null) {
-            $qb->setMaxResults($limit);
-        }
-
-        $qb->setFirstResult($offset);
-
-        return $qb->getQuery()->getResult();
+        return array_map(
+            fn(FormDefinition $form) => new FormWithStatistics(
+                $form,
+                $fieldsByForms[$form->getId()],
+                $submissionsByForms[$form->getId()],
+            ),
+            $forms,
+        );
     }
 
-    public function countSearch(?string $search = null, ?Project $project = null): int
+    public function searchCount(?string $query = null, array $params = []): int
+    {
+        return (int) $this->buildSearchQuery($query, $params)
+            ->select('COUNT(f.id)')
+            ->getQuery()
+            ->getSingleScalarResult()
+        ;
+    }
+
+    private function buildSearchQuery(?string $query = null, array $params = [], ?int $limit = null, int $offset = 0): QueryBuilder
     {
         $qb = $this->createQueryBuilder('f')
-            ->select('COUNT(f.id)');
+            ->setMaxResults($limit)
+            ->setFirstResult($limit ? $offset : null);
+        ;
 
-        if ($search !== null && $search !== '') {
-            $qb->andWhere('LOWER(f.name) LIKE LOWER(:search)')
-                ->setParameter('search', '%' . $search . '%');
+        if (!empty($query)) {
+            $qb->andWhere('LOWER(f.name) LIKE LOWER(:query)')
+                ->setParameter('query', $query)
+            ;
         }
 
-        if ($project !== null) {
+        if (!empty($params['project'])) {
             $qb->andWhere('f.project = :project')
-                ->setParameter('project', $project);
+                ->setParameter('project', $params['project'])
+            ;
         }
 
-        return (int) $qb->getQuery()->getSingleScalarResult();
+        return $qb;
     }
 }

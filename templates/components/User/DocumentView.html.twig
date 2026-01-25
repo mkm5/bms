@@ -12,10 +12,11 @@
                 <twig:Elements:Button
                     variant="secondary"
                     size="sm"
-                    data-action="live#action"
-                    data-live-action-param="editDocument"
+                    data-action="live#emit"
+                    data-live-event-param="document:edit"
+                    data-live-document-param="{{ document.id }}"
                 >
-                    <twig:ux:icon name="tabler:edit" class="w-4 h-4 mr-1" />Edit
+                    <twig:ux:icon name="tabler:edit" class="w-4 h-4 mr-1" /> Edit
                 </twig:Elements:Button>
             </div>
             <div class="p-6 space-y-6">
@@ -49,10 +50,11 @@
                 <h2 class="text-lg font-semibold text-gray-900">Version History</h2>
                 <twig:Elements:Button
                     size="sm"
-                    data-action="live#action"
-                    data-live-action-param="uploadVersion"
+                    data-action="live#emit"
+                    data-live-event-param="document:version-upload"
+                    data-live-document-param="{{ document.id }}"
                 >
-                    <twig:ux:icon name="tabler:upload" class="w-4 h-4 mr-1" />Upload New Version
+                    <twig:ux:icon name="tabler:upload" class="w-4 h-4 mr-1" /> Upload New Version
                 </twig:Elements:Button>
             </div>
             <div class="p-6">
@@ -120,11 +122,11 @@
         </div>
     </div>
 
-    <twig:Elements:Modal name="{{ this.editModalName }}">
-        <twig:User:DocumentEdit />
+    <twig:Elements:Modal name="document">
+        <twig:User:DocumentEdit modalName="document" />
     </twig:Elements:Modal>
 
-    <twig:Elements:Modal name="{{ this.versionModalName }}">
-        <twig:User:DocumentVersionUpload />
+    <twig:Elements:Modal name="document-version">
+        <twig:User:DocumentVersionUpload modalName="document-version" />
     </twig:Elements:Modal>
 </div>

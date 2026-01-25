@@ -10,8 +10,9 @@
             <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
                 <h2 class="text-lg font-semibold text-gray-900">Company Details</h2>
                 <twig:Elements:Button
-                    data-action="live#action"
-                    data-live-action-param="editCompany"
+                    data-action="live#emit"
+                    data-live-event-param="company:edit"
+                    data-live-company-param="{{ company.id }}"
                 >
                     <twig:ux:icon name="tabler:pencil" class="mr-2" />Edit
                 </twig:Elements:Button>
@@ -69,7 +70,7 @@
         </div>
     </div>
 
-    <twig:Elements:Modal name="{{ this.modalName }}">
-        <twig:User:CompanyEdit />
+    <twig:Elements:Modal name="company">
+        <twig:User:CompanyEdit modalName="company" />
     </twig:Elements:Modal>
 </div>

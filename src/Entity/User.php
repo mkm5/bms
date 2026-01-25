@@ -194,6 +194,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function isRegistered(): bool
+    {
+        return !empty($this->password);
+    }
+
     public function getDisplayName(): string
     {
         $fn = $this->getFirstName() ?? '';

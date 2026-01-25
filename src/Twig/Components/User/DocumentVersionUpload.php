@@ -31,7 +31,7 @@ final class DocumentVersionUpload extends AbstractController
     use DefaultActionTrait;
 
     #[LiveProp]
-    public string $modalName = 'document-version';
+    public string $modalName;
 
     #[LiveProp]
     public ?Document $document = null;
@@ -86,7 +86,7 @@ final class DocumentVersionUpload extends AbstractController
         $this->resetForm();
     }
 
-    #[LiveListener('document:version:upload')]
+    #[LiveListener('document:version-upload')]
     public function onDocumentVersionUpload(#[LiveArg] int $document): void
     {
         $this->document = $this->documentRepository->find($document);

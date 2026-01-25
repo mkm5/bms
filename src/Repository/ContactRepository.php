@@ -4,65 +4,61 @@ namespace App\Repository;
 
 use App\Entity\Contact;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<Contact>
+ * @implements SearchableRepositoryInterface<Contact>
  */
-class ContactRepository extends ServiceEntityRepository
+class ContactRepository extends ServiceEntityRepository implements SearchableRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Contact::class);
     }
 
-    /**
-     * @return Contact[]
-     */
-    public function search(
-        ?string $search = null,
-        ?int $limit = null,
-        int $offset = 0,
-    ): array {
-        $qb = $this->createQueryBuilder('c')
-            ->leftJoin('c.company', 'company')
+    /** @return Contact[] */
+    public function search(?string $query = null, array $params = [], ?int $limit = null, int $offset = 0): array
+    {
+        return $this->buildSearchQuery($query, $params, $limit, $offset)
             ->addSelect('company')
             ->orderBy('c.id', 'DESC')
+            ->getQuery()
+            ->getResult()
         ;
-
-        if ($search !== null && $search !== '') {
-            $qb->andWhere(
-                    $qb->expr()->orX(
-                        $qb->expr()->like('c.firstName', ':search'),
-                        $qb->expr()->like('c.lastName', ':search'),
-                        $qb->expr()->like('c.address', ':search'),
-                        $qb->expr()->like('company.name', ':search'),
-                    )
-                )
-                ->setParameter('search', '%'.$search.'%')
-            ;
-        }
-
-        if ($limit !== null) {
-            $qb->setMaxResults($limit)
-                ->setFirstResult($offset)
-            ;
-        }
-
-        return $qb->getQuery()->getResult();
     }
 
-    public function countSearch(?string $search = null): int
+    public function searchCount(?string $query = null, array $params = []): int
+    {
+        return (int)$this->buildSearchQuery($query, $params)
+            ->select('COUNT(c.id)')
+            ->getQuery()
+            ->getSingleColumnResult()
+        ;
+    }
+
+    private function buildSearchQuery(?string $query = null, array $params = [], ?int $limit = null, int $offset = 0): QueryBuilder
     {
         $qb = $this->createQueryBuilder('c')
-            ->select('COUNT(c.id)')
-            ->leftJoin('c.company', 'company');
+            ->leftJoin('c.company', 'company')
+            ->setMaxResults($limit)
+            ->setFirstResult($limit ? $offset : null);
+        ;
 
-        if ($search !== null && $search !== '') {
-            $qb->andWhere('LOWER(c.firstName) LIKE LOWER(:search) OR LOWER(c.lastName) LIKE LOWER(:search) OR LOWER(company.name) LIKE LOWER(:search)')
-                ->setParameter('search', '%' . $search . '%');
+        if (!empty($query)) {
+            $qb->andWhere(
+                    $qb->expr()->orX(
+                        $qb->expr()->like('LOWER(c.firstName)', 'LOWER(:query)'),
+                        $qb->expr()->like('LOWER(c.lastName)', 'LOWER(:query)'),
+                        $qb->expr()->like('LOWER(c.address)', 'LOWER(:query)'),
+                        $qb->expr()->like('LOWER(company.name)', 'LOWER(:query)'),
+                    )
+                )
+                ->setParameter('query', '%'.$query.'%')
+            ;
         }
 
-        return (int) $qb->getQuery()->getSingleScalarResult();
+        return $qb;
     }
 }

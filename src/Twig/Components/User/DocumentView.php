@@ -7,7 +7,6 @@ use App\Entity\DocumentVersion;
 use App\Repository\DocumentRepository;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
-use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveArg;
 use Symfony\UX\LiveComponent\Attribute\LiveListener;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
@@ -23,12 +22,6 @@ final class DocumentView
     #[LiveProp]
     public Document $document;
 
-    #[LiveProp]
-    public string $editModalName = 'document-edit';
-
-    #[LiveProp]
-    public string $versionModalName = 'document-version';
-
     public function __construct(
         private readonly UrlGeneratorInterface $urlGenerator,
         private readonly DocumentRepository $documentRepository,
@@ -41,18 +34,6 @@ final class DocumentView
             'storageId' => $version->getFile()->getStorageId(),
             'publicId' => $version->getFile()->getPublicId(),
         ]);
-    }
-
-    #[LiveAction]
-    public function editDocument(): void
-    {
-        $this->emit('document:edit', ['document' => $this->document->getId()]);
-    }
-
-    #[LiveAction]
-    public function uploadVersion(): void
-    {
-        $this->emit('document:version:upload', ['document' => $this->document->getId()]);
     }
 
     #[LiveListener('document:update')]

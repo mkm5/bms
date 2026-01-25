@@ -4,59 +4,18 @@ namespace App\Repository;
 
 use App\Entity\Document;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<Document>
+ * @implements SearchableRepository<Document>
  */
-class DocumentRepository extends ServiceEntityRepository
+class DocumentRepository extends ServiceEntityRepository implements SearchableRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Document::class);
-    }
-
-    /** @return Document[] */
-    public function search(string $query, int $limit = 20, int $offset = 0): array
-    {
-        $sql = <<<SQL
-        SELECT id
-        FROM document
-        WHERE search_data @@ websearch_to_tsquery('simple', :query)
-        ORDER BY id DESC
-        LIMIT :limit
-        OFFSET :offset
-        SQL;
-
-        $params = [
-            'query' => $query,
-            'limit' => $limit,
-            'offset' => $offset,
-        ];
-
-        $conn = $this->getEntityManager()->getConnection();
-        $ids = $conn->executeQuery($sql, $params)->fetchFirstColumn();
-        if (empty($ids)) {
-            return [];
-        }
-
-        return $this->createQueryBuilder('d')
-            ->leftJoin('d.currentVersion', 'cv')
-            ->addSelect('cv')
-            ->where('d.id IN (:ids)')
-            ->setParameter('ids', $ids)
-            ->orderBy('d.id', 'DESC')
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-
-    public function countByQuery(string $query): int
-    {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT COUNT(*) FROM document WHERE search_data @@ websearch_to_tsquery('simple', :query)";
-        $params = ['query' => $query];
-        return (int) $conn->executeQuery($sql, $params)->fetchOne();
     }
 
     /** @return Document[] */
@@ -80,5 +39,45 @@ class DocumentRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult()
         ;
+    }
+
+    /**
+     * @return Document[]
+     */
+    public function search(?string $query = null, array $params = [], ?int $limit = null, int $offset = 0): array
+    {
+        return $this->buildSearchQuery($query, $params, $limit, $offset)
+            ->leftJoin('d.currentVersion', 'cv')
+            ->addSelect('cv')
+            ->orderBy('d.id', 'DESC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function searchCount(?string $query = null, array $params = []): int
+    {
+        return (int) $this->buildSearchQuery($query, $params)
+            ->select('COUNT(d.id)')
+            ->getQuery()
+            ->getSingleScalarResult()
+        ;
+    }
+
+    private function buildSearchQuery(?string $query = null, array $params = [], ?int $limit = null, int $offset = 0): QueryBuilder
+    {
+        $qb = $this->createQueryBuilder('d')
+            ->setMaxResults($limit)
+            ->setFirstResult($limit ? $offset : null)
+        ;
+
+        if (!empty($query)) {
+            $qb->andWhere('WORD_SIMILARITY(:query, d.searchData) > :treshold')
+                ->setParameter('query', '%'.$query.'%')
+                ->setParameter('treshold', 0.45)
+            ;
+        }
+
+        return $qb;
     }
 }

@@ -12,7 +12,12 @@ final class CompanyController extends AbstractController
     #[Route('/companies', name: 'app_user_companies')]
     public function index(): Response
     {
-        return $this->render('user/companies.html.twig');
+        return $this->render('listings/listing.html.twig', [
+            'title' => 'Company',
+            'headerTitle' => 'Company',
+            'listing' => '_companies.html.twig',
+            'entityClassName' => Company::class,
+        ]);
     }
 
     #[Route('/companies/{id}', name: 'app_user_company_view')]

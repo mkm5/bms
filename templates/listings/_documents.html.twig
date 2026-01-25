@@ -1,0 +1,40 @@
+<twig:Common:Listing entityClassName="{{ entityClassName }}"  {{ ...(documentsListingProps ?? {}) }}>
+    <twig:block name="headers_action_right">
+        <twig:Elements:Button data-action="live#emit" data-live-event-param="document:create">
+            <twig:ux:icon name="tabler:file-plus" class="mr-2"/>New Document
+        </twig:Elements:Button>
+    </twig:block>
+    <twig:block name="table_head">
+        <twig:Elements:Th class="w-16">ID</twig:Elements:Th>
+        <twig:Elements:Th>Name</twig:Elements:Th>
+        <twig:Elements:Th>Version</twig:Elements:Th>
+        <twig:Elements:Th>Original File</twig:Elements:Th>
+    </twig:block>
+    <twig:block name="table_row">
+        <twig:Elements:Td>{{ item.id }}</twig:Elements:Td>
+        <twig:Elements:Td>
+            <twig:Elements:Button variant="link" href="{{ path('app_user_document_view', {id: item.id}) }}">
+                {{ item.name }}
+            </twig:Elements:Button>
+        </twig:Elements:Td>
+        <twig:Elements:Td>
+            {% if item.currentVersion %}
+                v{{ item.currentVersion.versionNumber }}
+            {% else %}
+                <span class="text-gray-400">-</span>
+            {% endif %}
+        </twig:Elements:Td>
+        <twig:Elements:Td>
+            {% if item.currentVersion %}
+                {{ item.currentVersion.originalFileName }}
+            {% else %}
+                <span class="text-gray-400">-</span>
+            {% endif %}
+        </twig:Elements:Td>
+    </twig:block>
+    <twig:block name="post_table">
+        <twig:Elements:Modal name="document">
+            <twig:User:DocumentCreate modalName="document"/>
+        </twig:Elements:Modal>
+    </twig:block>
+</twig:Common:Listing>

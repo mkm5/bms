@@ -1,0 +1,25 @@
+<twig:User:FormSubmissionsListing form="{{ form }}" entityClassName="{{ entityClassName }}"  {{ ...(formSubmissionsListingProps ?? {}) }}>
+    <twig:block name="headers_action_right">
+        <span class="text-sm text-gray-500">{{ this.totalItems }} total</span>
+    </twig:block>
+    <twig:block name="table_head">
+        <twig:Elements:Th class="w-16">ID</twig:Elements:Th>
+        {%- for field in this.fields -%}
+            <twig:Elements:Th>{{ field.name }}</twig:Elements:Th>
+        {%- endfor -%}
+        <twig:Elements:Th>Submitted At</twig:Elements:Th>
+    </twig:block>
+    <twig:block name="table_row">
+        <twig:Elements:Td>{{ item.id }}</twig:Elements:Td>
+        {%- for field in this.fields -%}
+        <twig:Elements:Td>
+            {%- set value = item.data[field.label] ?? null -%}
+            {%- if value is null -%}-
+            {%- elseif value is iterable -%}{{ value|join(', ') }}
+            {%- else -%}{{ value }}
+            {%- endif -%}
+        </twig:Elements:Td>
+        {%- endfor -%}
+        <twig:Elements:Td>{{ item.submittedAt|date('Y-m-d H:i') }}</twig:Elements:Td>
+    </twig:block>
+</twig:User:FormSubmissionsListing>

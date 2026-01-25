@@ -1,0 +1,50 @@
+<twig:Common:Listing entityClassName="{{ entityClassName }}"  {{ ...(contactsListingProps ?? {}) }}>
+    <twig:block name="headers_action_right">
+        <twig:Elements:Button data-action="live#emit" data-live-event-param="contact:edit">
+            <twig:ux:icon name="tabler:user-plus" class="mr-2"/>New Contact
+        </twig:Elements:Button>
+    </twig:block>
+    <twig:block name="table_head">
+        <twig:Elements:Th>Name</twig:Elements:Th>
+        <twig:Elements:Th>Company</twig:Elements:Th>
+        <twig:Elements:Th>Email</twig:Elements:Th>
+        <twig:Elements:Th class="text-right whitespace-nowrap w-8">Actions</twig:Elements:Th>
+    </twig:block>
+    <twig:block name="table_row">
+        <twig:Elements:Td class="text-gray-900">
+            <twig:Elements:Button variant="link" href="{{ path('app_user_contact_view', {id: item.id}) }}">
+                {{ item.firstName }} {{ item.lastName }}
+            </twig:Elements:Button>
+        </twig:Elements:Td>
+        <twig:Elements:Td>
+            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                {{- item.company.name -}}
+            </span>
+        </twig:Elements:Td>
+        <twig:Elements:Td>
+            {%- for email in item.emails  -%}
+                <twig:Elements:Button variant="link" href="mailto:{{ email.value }}">
+                    {{ email.value }}
+                </twig:Elements:Button>
+            {%- endfor -%}
+        </twig:Elements:Td>
+        <twig:Elements:Td class="text-gray-900 whitespace-nowrap text-right">
+            <twig:Elements:Dropdown variant='short'>
+                <button
+                    type="button"
+                    data-action="live#emit"
+                    data-live-event-param="contact:edit"
+                    data-live-contact-param="{{ item.id }}"
+                    class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                >
+                    <twig:ux:icon name="tabler:pencil" class="w-4 h-4" /> Edit
+                </button>
+            </twig:Elements:Dropdown>
+        </twig:Elements:Td>
+    </twig:block>
+    <twig:block name="post_table">
+        <twig:Elements:Modal name="contact">
+            <twig:User:ContactEdit modalName="contact"/>
+        </twig:Elements:Modal>
+    </twig:block>
+</twig:Common:Listing>

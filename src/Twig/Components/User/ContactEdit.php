@@ -25,7 +25,7 @@ final class ContactEdit extends AbstractController
     use DefaultActionTrait;
 
     #[LiveProp]
-    public string $editModalName = 'contact';
+    public string $modalName;
 
     #[LiveProp]
     public ?Contact $viewContact = null;
@@ -52,7 +52,7 @@ final class ContactEdit extends AbstractController
         $this->em->persist($contact);
         $this->em->flush();
 
-        $this->dispatchBrowserEvent('modal:close', ['id' => $this->editModalName]);
+        $this->dispatchBrowserEvent('modal:close', ['id' => $this->modalName]);
         $this->emit('contact:update', ['contact' => $contact->getId()]);
         $this->viewContact = null;
         $this->resetForm();
@@ -83,7 +83,7 @@ final class ContactEdit extends AbstractController
             throw new \ValueError('Contact with id "' . ($contact) . '" does not exist');
         }
 
-        $this->dispatchBrowserEvent('modal:open', ['id' => $this->editModalName]);
+        $this->dispatchBrowserEvent('modal:open', ['id' => $this->modalName]);
         $this->resetForm();
     }
 }

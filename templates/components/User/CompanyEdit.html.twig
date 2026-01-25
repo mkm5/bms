@@ -10,7 +10,8 @@
         }
     }) }}
         {{ form_row(form.name) }}
-
-        <twig:Elements:Button type="submit" class="mt-6">Save</twig:Elements:Button>
+        {{ form_row(form.address) }}
+        {{ form_row(form.note) }}
+        <twig:Elements:Button type="submit">Save</twig:Elements:Button>
     {{ form_end(form) }}
 </div>

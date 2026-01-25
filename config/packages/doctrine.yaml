@@ -7,6 +7,9 @@ doctrine:
         #server_version: '16'
 
         profiling_collect_backtrace: '%kernel.debug%'
+
+        types:
+                TsVector: OpsWay\Doctrine\DBAL\Types\TsVector
     orm:
         validate_xml_mapping: true
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
@@ -25,7 +28,14 @@ doctrine:
 
         dql:
             string_functions:
-                JSONB_CONTAINS: Scienta\DoctrineJsonFunctions\Query\AST\Functions\Postgresql\JsonbContains
+                SIMILARITY: App\Doctrine\ORM\Query\AST\Functions\Similarity
+                WORD_SIMILARITY: App\Doctrine\ORM\Query\AST\Functions\WordSimilarity
+                TO_TSVECTOR: OpsWay\Doctrine\ORM\Query\AST\Functions\ToTsvector
+                TO_TSQUERY: OpsWay\Doctrine\ORM\Query\AST\Functions\ToTsquery
+                WEBSEARCH_TO_TSQUERY: App\Doctrine\ORM\Query\AST\Functions\WebsearchToTsquery
+                TS_CONCAT_OP: OpsWay\Doctrine\ORM\Query\AST\Functions\TsConcat
+                TS_MATCH_OP: OpsWay\Doctrine\ORM\Query\AST\Functions\TsMatch
+                JSONB_CONTAINS: OpsWay\Doctrine\ORM\Query\AST\Functions\Contains
 
 when@test:
     doctrine:

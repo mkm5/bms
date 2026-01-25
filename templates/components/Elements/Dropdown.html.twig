@@ -1,3 +1,16 @@
+{%- set dropdown_cva = html_cva(
+    base: 'inline-flex rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
+    variants: {
+        variant: {
+            long: 'justify-between items-center w-64 px-4 py-2 text-sm font-medium text-stone-800 bg-white border border-gray-200 rounded-lg hover:bg-gray-50',
+            short: 'items-center justify-center w-8 h-8 text-gray-600 hover:text-gray-900 hover:bg-gray-100',
+        },
+    },
+    default_variant: {
+        variant: 'long',
+    },
+) -%}
+
 <div
     class="relative inline-block text-left"
     data-controller="dropdown"
@@ -5,20 +18,24 @@
     <button
         type="button"
         data-action="click->dropdown#toggle"
-        class="inline-flex justify-between items-center w-64 px-4 py-2 text-sm font-medium text-stone-800 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        class="{{ dropdown_cva.apply({variant}) }}"
     >
-        <span>{%- block header -%}{%- endblock header -%}</span>
-        <twig:ux:icon
-            name="tabler:chevron-down"
-            data-dropdown-target="chevron"
-            class="w-5 h-5 ml-2 -mr-1"
-            width="20"
-            height="20"
-        />
+        {%- if variant == 'long' -%}
+            <span>{%- block header -%}{%- endblock header -%}</span>
+            <twig:ux:icon
+                name="tabler:chevron-down"
+                data-dropdown-target="chevron"
+                class="w-5 h-5 ml-2 -mr-1"
+                width="20"
+                height="20"
+            />
+        {%- else -%}
+            <twig:ux:icon name="tabler:menu-2" class="w-5 h-5" />
+        {%- endif -%}
     </button>
 
     <div
-        class="hidden absolute left-0 z-10 mt-1 w-64 origin-top-left bg-white rounded-md shadow-xl ring-1 ring-black/5"
+        class="hidden fixed z-50 w-64 mt-1 origin-top-left bg-white rounded-md shadow-xl ring-1 ring-black/5"
         data-dropdown-target="menu"
     >
         <div class="p-2 space-y-1 max-h-60 overflow-y-auto">

@@ -21,10 +21,11 @@ final class ProjectView
     use ComponentToolsTrait;
     use DefaultActionTrait;
 
-    public const MODAL_NAME = 'project';
-
     #[LiveProp]
     public Project $project;
+
+    #[LiveProp]
+    public array $formListingConfig;
 
     public function __construct(
         private readonly ProjectRepository $projectRepository,
@@ -42,22 +43,10 @@ final class ProjectView
     }
 
     #[LiveAction]
-    public function editProject(): void
-    {
-        $this->emit('project:edit', ['project' => $this->project->getId()]);
-    }
-
-    #[LiveAction]
     public function toggleProjectStatus(): void
     {
         $this->project->setIsFinished(!$this->project->isFinished());
         $this->em->flush();
-    }
-
-    #[LiveAction]
-    public function openDocumentSearch(): void
-    {
-        $this->emit('project:assignDocument', ['project' => $this->project->getId()]);
     }
 
     #[LiveAction]
@@ -68,15 +57,5 @@ final class ProjectView
             $this->project->removeDocument($document);
             $this->em->flush();
         }
-    }
-
-    public function getModalName(): string
-    {
-        return self::MODAL_NAME;
-    }
-
-    public function getDocumentSearchModalName(): string
-    {
-        return ProjectDocumentSearch::MODAL_NAME;
     }
 }

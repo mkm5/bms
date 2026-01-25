@@ -154,6 +154,31 @@ class Contact
         return $this->withCommuncationChannel(CommunicationType::PHONE_PERSONAL, $phone);
     }
 
+    public function communicationChannelsByType(CommunicationType|string $type): array
+    {
+        if (!($type instanceof CommunicationType)) {
+            $type = CommunicationType::from($type);
+        }
+
+        return $this->communcationChannels
+            ->filter(fn(CommunicationChannel $cc) => $cc->getType() === $type)
+            ->toArray()
+        ;
+    }
+
+    public function getEmails(): array
+    {
+        return $this->communicationChannelsByType(CommunicationType::EMAIL);
+    }
+
+    public function getPhones(): array
+    {
+        return array_merge(
+            $this->communicationChannelsByType(CommunicationType::PHONE_WORK),
+            $this->communicationChannelsByType(CommunicationType::PHONE_PERSONAL),
+        );
+    }
+
     public function getCompany(): ?Company
     {
         return $this->company;

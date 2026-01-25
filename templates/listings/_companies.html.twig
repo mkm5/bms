@@ -1,0 +1,38 @@
+<twig:Common:Listing entityClassName="{{ entityClassName }}"  {{ ...(companiesListingProps ?? {}) }}>
+    <twig:block name="headers_action_right">
+        <twig:Elements:Button data-action="live#emit" data-live-event-param="company:edit">
+            <twig:ux:icon name="tabler:building-plus" class="mr-2"/>New Company
+        </twig:Elements:Button>
+    </twig:block>
+    <twig:block name="table_head">
+        <twig:Elements:Th>Name</twig:Elements:Th>
+        <twig:Elements:Th>Contacts</twig:Elements:Th>
+        <twig:Elements:Th>Projects</twig:Elements:Th>
+        <twig:Elements:Th class="text-right whitespace-nowrap w-8">Actions</twig:Elements:Th>
+    </twig:block>
+    <twig:block name="table_row">
+        <twig:Elements:Td class="text-gray-900">
+            <twig:Elements:Button variant="link" href="{{ path('app_user_company_view', {id: item.id}) }}">
+                {{- item.name -}}
+            </twig:Elements:Button>
+        </twig:Elements:Td>
+        <twig:Elements:Td>{{ item.contacts.count }}</twig:Elements:Td>
+        <twig:Elements:Td>{{ item.projects.count }}</twig:Elements:Td>
+        <twig:Elements:Td class="text-gray-900 whitespace-nowrap text-right">
+            <twig:Elements:Dropdown variant='short'>
+                <twig:Elements:DropdownButton
+                    data-action="live#emit"
+                    data-live-event-param="company:edit"
+                    data-live-company-param="{{ item.id }}"
+                >
+                    <twig:ux:icon name="tabler:pencil" class="w-4 h-4" /> Edit
+                </twig:Elements:DropdownButton>
+            </twig:Elements:Dropdown>
+        </twig:Elements:Td>
+    </twig:block>
+    <twig:block name="post_table">
+        <twig:Elements:Modal name="company">
+            <twig:User:CompanyEdit modalName="company"/>
+        </twig:Elements:Modal>
+    </twig:block>
+</twig:Common:Listing>

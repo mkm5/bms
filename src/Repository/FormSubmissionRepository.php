@@ -5,10 +5,14 @@ namespace App\Repository;
 use App\Entity\FormDefinition;
 use App\Entity\FormSubmission;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
-/** @extends ServiceEntityRepository<FormSubmission> */
-class FormSubmissionRepository extends ServiceEntityRepository
+/**
+ * @extends ServiceEntityRepository<FormSubmission>
+ * @implements SearchableRepository<FormSubmission>
+*/
+class FormSubmissionRepository extends ServiceEntityRepository implements SearchableRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
@@ -16,47 +20,48 @@ class FormSubmissionRepository extends ServiceEntityRepository
     }
 
     /** @return FormSubmission[] */
-    public function search(FormDefinition $form, string $query, int $limit = 20, int $offset = 0): array
+    public function search(?string $query = null, array $params = [], ?int $limit = null, int $offset = 0): array
     {
-        $sql = <<<SQL
-        SELECT id
-        FROM form_submission
-        WHERE
-            search_data @@ websearch_to_tsquery('simple', :query)
-            AND form_id = :formId
-        ORDER BY submitted_at DESC
-        LIMIT :limit
-        OFFSET :offset
-        SQL;
-
-        $params = [
-            'formId' => $form->getId(),
-            'query' => $query,
-            'limit' => $limit,
-            'offset' => $offset,
-        ];
-
-        $conn = $this->getEntityManager()->getConnection();
-        $ids = $conn->executeQuery($sql, $params)->fetchFirstColumn();
-        if (empty($ids)) {
-            return [];
-        }
-
-        return $this->createQueryBuilder('s')
-            ->where('s.id IN (:ids)')
-            ->setParameter('ids', $ids)
-            ->orderBy('s.submittedAt', 'DESC')
+        return $this->buildSearchQuery($query, $params, $limit, $offset)
+            ->join('fs.form', 'f')
+            ->addSelect('f')
+            ->addOrderBy('fs.submittedAt', 'DESC')
             ->getQuery()
             ->getResult()
         ;
     }
 
-    public function countByQuery(FormDefinition $form, string $query): int
+    public function searchCount(?string $query = null, array $params = []): int
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT COUNT(*) FROM form_submission WHERE form_id = :formId AND search_data @@ websearch_to_tsquery('simple', :query)";
-        $params = ['formId' => $form->getId(), 'query' => $query];
-        return (int) $conn->executeQuery($sql, $params)->fetchOne();
+        return (int) $this->buildSearchQuery($query, $params)
+            ->select('COUNT(fs.id)')
+            ->getQuery()
+            ->getSingleScalarResult()
+        ;
+    }
+
+
+    private function buildSearchQuery(?string $query = null, array $params = [], ?int $limit = null, int $offset = 0): QueryBuilder
+    {
+        $qb = $this->createQueryBuilder('fs')
+            ->setMaxResults($limit)
+            ->setFirstResult($limit ? $offset : null)
+        ;
+
+        if (!empty($params['form'])) {
+            $qb->andWhere('fs.form = :form')
+                ->setParameter('form', $params['form'])
+            ;
+        }
+
+        if (!empty($query)) {
+            $qb->andWhere('WORD_SIMILARITY(:query, fs.searchData) > :treshold')
+                ->setParameter('query', '%'.$query.'%')
+                ->setParameter('treshold', 0.45)
+            ;
+        }
+
+        return $qb;
     }
 
     /** @return FormSubmission[] */

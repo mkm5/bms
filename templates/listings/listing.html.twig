@@ -1,0 +1,8 @@
+{% extends 'default_layout.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block header_title %}{{ headerTitle }}{% endblock %}
+
+{% block content %}
+    {{ include('listings/' ~ listing) }}
+{% endblock %}

@@ -26,7 +26,7 @@ final class DocumentEdit extends AbstractController
     use DefaultActionTrait;
 
     #[LiveProp]
-    public string $modalName = 'document-edit';
+    public string $modalName;
 
     #[LiveProp]
     public ?Document $document = null;

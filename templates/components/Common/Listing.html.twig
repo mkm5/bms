@@ -1,0 +1,48 @@
+{% import "elements.html.twig" as c %}
+
+<div
+    class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"
+    {{ attributes }}
+>
+    <div class="px-6 py-4 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        {%- block header_actions -%}
+            <div class="flex flex-wrap gap-2">
+                {%- block header_actions_left -%}
+                    <input
+                        class="{{ c._input('w-64') }}"
+                        type="text"
+                        data-model="debounce(150)|query"
+                        placeholder="Search..."
+                    >
+                    {%- block filters -%}{%- endblock filters -%}
+                {%- endblock header_actions_left -%}
+            </div>
+            <div class="flex flex-wrap gap-2">{%- block headers_action_right -%}{%- endblock -%}</div>
+        {%- endblock header_actions -%}
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full text-sm text-left text-gray-500">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b border-gray-200 whitespace-nowrap">
+                <tr>{%- block table_head -%}{%- endblock table_head -%}</tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 whitespace-nowrap">
+                {% if this.totalItems > 0 %}
+                    {% for item in this.items %}
+                        <tr class="hover:bg-gray-50">{%- block table_row -%}{%- endblock table_row -%}</tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="100%" class="px-6 py-8 text-center text-gray-500">No items found</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if this.totalPages > 1 %}
+        {% include 'components/Common/_pagination.html.twig' %}
+    {% endif %}
+
+    {%- block post_table -%}{%- endblock post_table -%}
+</div>

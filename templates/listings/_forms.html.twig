@@ -1,0 +1,45 @@
+<twig:Common:Listing entityClassName="{{ entityClassName }}"  {{ ...(formsListingProps ?? {}) }}>
+    <twig:block name="headers_action_right">
+        <twig:Elements:Button href="{{ path('app_user_form_builder_new') }}">
+            <twig:ux:icon name="tabler:forms" class="mr-2"/>New Form
+        </twig:Elements:Button>
+    </twig:block>
+    <twig:block name="table_head">
+        <twig:Elements:Th>Name</twig:Elements:Th>
+        {%- if not this.hasParam('project') -%}
+        <twig:Elements:Th>Project</twig:Elements:Th>
+        {%- endif -%}
+        <twig:Elements:Th>Fields</twig:Elements:Th>
+        <twig:Elements:Th>Submissions</twig:Elements:Th>
+        <twig:Elements:Th class="text-right whitespace-nowrap w-8">Actions</twig:Elements:Th>
+    </twig:block>
+    <twig:block name="table_row">
+        <twig:Elements:Td class="text-gray-900">
+            <twig:Elements:Button variant="link" href="{{ path('app_user_form_submissions', {id: item.form.id}) }}">
+                {{- item.form.name -}}
+            </twig:Elements:Button>
+        </twig:Elements:Td>
+        {%- if not this.hasParam('project') -%}
+        <twig:Elements:Td>
+            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                {{- item.form.project.name -}}
+            </span>
+        </twig:Elements:Td>
+        {%- endif -%}
+        <twig:Elements:Td>{{ item.fields }}</twig:Elements:Td>
+        <twig:Elements:Td>{{ item.submissions }} </twig:Elements:Td>
+        <twig:Elements:Td class="text-gray-900 whitespace-nowrap text-right">
+            <twig:Elements:Button
+                variant="link"
+                href="{{ path('app_user_form_builder_edit', {id: item.form.id}) }}"
+            >
+                <twig:ux:icon name="tabler:pencil" class="w-4 h-4" /> Edit
+            </twig:Elements:Button>
+        </twig:Elements:Td>
+    </twig:block>
+    <twig:block name="post_table">
+        <twig:Elements:Modal name="company">
+            <twig:User:CompanyEdit modalName="company"/>
+        </twig:Elements:Modal>
+    </twig:block>
+</twig:Common:Listing>

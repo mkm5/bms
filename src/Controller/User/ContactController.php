@@ -12,7 +12,12 @@ final class ContactController extends AbstractController
     #[Route('/contacts', name: 'app_user_contacts')]
     public function index(): Response
     {
-        return $this->render('user/contacts.html.twig');
+        return $this->render('listings/listing.html.twig', [
+            'title' => 'Contact',
+            'headerTitle' => 'Contact',
+            'listing' => '_contacts.html.twig',
+            'entityClassName' => Contact::class,
+        ]);
     }
 
     #[Route('/contacts/{id}', name: 'app_user_contact_view')]

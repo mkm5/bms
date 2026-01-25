@@ -6,7 +6,6 @@ use App\Entity\Company;
 use App\Repository\CompanyRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
-use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveArg;
 use Symfony\UX\LiveComponent\Attribute\LiveListener;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
@@ -18,8 +17,6 @@ final class CompanyView
 {
     use ComponentToolsTrait;
     use DefaultActionTrait;
-
-    public const MODAL_NAME = 'company';
 
     #[LiveProp]
     public Company $company;
@@ -36,16 +33,5 @@ final class CompanyView
         if ($company && $this->company->getId() === $company) {
             $this->company = $this->companyRepository->find($company);
         }
-    }
-
-    #[LiveAction]
-    public function editCompany(): void
-    {
-        $this->emit('company:edit', ['company' => $this->company->getId()]);
-    }
-
-    public function getModalName(): string
-    {
-        return self::MODAL_NAME;
     }
 }

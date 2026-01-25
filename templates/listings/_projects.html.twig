@@ -1,0 +1,70 @@
+<twig:Common:Listing entityClassName="{{ entityClassName }}"  {{ ...(projectsListingProps ?? {}) }}>
+    <twig:block name="headers_action_right">
+        <twig:Elements:Button data-action="live#emit" data-live-event-param="project:edit">
+            <twig:ux:icon name="tabler:folder-plus" class="mr-2"/>New Project
+        </twig:Elements:Button>
+    </twig:block>
+    <twig:block name="table_head">
+        <twig:Elements:Th>Name</twig:Elements:Th>
+        <twig:Elements:Th>Managers</twig:Elements:Th>
+        <twig:Elements:Th class="w-8">Status</twig:Elements:Th>
+        <twig:Elements:Th class="text-right whitespace-nowrap w-8">Actions</twig:Elements:Th>
+    </twig:block>
+    <twig:block name="table_row">
+        <twig:Elements:Td class="text-gray-900">
+            <twig:Elements:Button variant="link" href="{{ path('app_user_project_view', {id: item.id}) }}">
+                {{ item.name }}
+            </twig:Elements:Button>
+        </twig:Elements:Td>
+        <twig:Elements:Td>
+            {% if item.managers|length > 0 %}
+                <div class="flex flex-wrap gap-1">
+                    {% for manager in item.managers %}
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                            {{- manager.displayName -}}
+                        </span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                -
+            {% endif %}
+        </twig:Elements:Td>
+        <twig:Elements:Td>
+            <twig:Elements:Pill
+                variant="{{ item.isFinished ? 'disabled' : 'default' }}"
+                content="{{ item.isFinished ? 'Finished' : 'Active' }}"
+            />
+        </twig:Elements:Td>
+        <twig:Elements:Td class="text-gray-900 whitespace-nowrap text-right">
+            <twig:Elements:Dropdown variant='short'>
+                <button
+                    type="button"
+                    data-action="live#emit"
+                    data-live-event-param="project:edit"
+                    data-live-project-param="{{ item.id }}"
+                    class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                >
+                    <twig:ux:icon name="tabler:pencil" class="w-4 h-4" /> Edit
+                </button>
+                <button
+                    type="button"
+                    data-action="live#action"
+                    data-live-action-param="toggleProjectStatus"
+                    data-live-project-param="{{ item.id }}"
+                    class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                >
+                    {% if item.isFinished %}
+                        <twig:ux:icon name="tabler:player-play" class="w-4 h-4" /> Mark as active
+                    {% else %}
+                        <twig:ux:icon name="tabler:check" class="w-4 h-4" /> Mark as finished
+                    {% endif %}
+                </button>
+            </twig:Elements:Dropdown>
+        </twig:Elements:Td>
+    </twig:block>
+    <twig:block name="post_table">
+        <twig:Elements:Modal name="project">
+            <twig:User:ProjectEdit modalName="project"/>
+        </twig:Elements:Modal>
+    </twig:block>
+</twig:Common:Listing>
