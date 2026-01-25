@@ -1,0 +1,51 @@
+{% extends 'default_layout.html.twig' %}
+
+{% block title %}Settings{% endblock %}
+
+{% block header_title %}Settings{% endblock %}
+
+{% block content %}
+    <div class="max-w-2xl space-y-8">
+        {%- for type, messages in app.flashes -%}
+            {%- for message in messages -%}
+                <twig:Elements:Alert variant="{{ type == 'error' ? 'destructive' : 'default' }}">
+                    <twig:block name="title">{{ message }}</twig:block>
+                </twig:Elements:Alert>
+            {%- endfor -%}
+        {%- endfor -%}
+
+        <section class="bg-white rounded-lg border border-gray-200 p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Profile Details</h2>
+            <p class="text-sm text-gray-500 mb-6">Update your personal information.</p>
+
+            {{ form_start(detailsForm) }}
+                <div class="space-y-4">
+                    {{ form_row(detailsForm.firstName) }}
+                    {{ form_row(detailsForm.lastName) }}
+                    {{ form_row(detailsForm.position) }}
+                </div>
+
+                <div class="mt-6">
+                    <twig:Elements:Button type="submit">Save Details</twig:Elements:Button>
+                </div>
+            {{ form_end(detailsForm) }}
+        </section>
+
+        <section class="bg-white rounded-lg border border-gray-200 p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Change Password</h2>
+            <p class="text-sm text-gray-500 mb-6">After changing your password, you will be logged out and need to sign in again.</p>
+
+            {{ form_start(passwordForm) }}
+                <div class="space-y-4">
+                    {{ form_row(passwordForm.currentPassword) }}
+                    {{ form_row(passwordForm.newPassword.first) }}
+                    {{ form_row(passwordForm.newPassword.second) }}
+                </div>
+
+                <div class="mt-6">
+                    <twig:Elements:Button type="submit" variant="danger">Change Password</twig:Elements:Button>
+                </div>
+            {{ form_end(passwordForm) }}
+        </section>
+    </div>
+{% endblock %}

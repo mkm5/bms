@@ -60,9 +60,9 @@
                         data-dropdown-target="menu"
                         class="hidden fixed z-50 w-64 origin-top-left bg-white border border-gray-200 rounded-lg shadow-lg py-1 transform transition-all duration-200"
                     >
-                        {#<a href="#" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-black">
+                        <a href="{{ path('app_user_settings') }}" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-black">
                             <twig:ux:icon name="tabler:settings" class="text-gray-400" /> Settings
-                        </a>#}
+                        </a>
                         <a href="{{ path('app_user_logout') }}" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-red-600">
                             <twig:ux:icon name="tabler:logout" class="text-gray-400" /> Logout
                         </a>
