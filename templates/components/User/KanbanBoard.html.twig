@@ -1,5 +1,6 @@
 <div
     {{ attributes.defaults(stimulus_controller('kanban-board')) }}
+    data-poll="delay(5000)|$render" {# Every 5 seconds it will request re-render of component #}
     id="kanban"
     class="w-full min-h-full flex flex-col grow basis-auto relative"
 >
