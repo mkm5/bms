@@ -81,7 +81,7 @@ final class DocumentCreate extends AbstractController
         $this->em->flush();
 
         $this->dispatchBrowserEvent('modal:close', ['id' => $this->modalName]);
-        $this->emit('document:update', ['document' => $document->getId()]);
+        $this->emit('listing:refresh');
         $this->resetForm();
     }
 

@@ -36,7 +36,7 @@ final class FormController extends AbstractController
             return $this->redirectToRoute('app_form_success', ['id' => $formDefinition->getId()]);
         }
 
-        return $this->render('Public/form/show.html.twig', [
+        return $this->render('form/show.html.twig', [
             'formDefinition' => $formDefinition,
             'form' => $form,
         ]);
@@ -45,6 +45,6 @@ final class FormController extends AbstractController
     #[Route('/f/{id}/success', name: 'app_form_success')]
     public function success(FormDefinition $formDefinition): Response
     {
-        return $this->render('Public/form/success.html.twig', ['formDefinition' => $formDefinition]);
+        return $this->render('form/success.html.twig', ['formDefinition' => $formDefinition]);
     }
 }

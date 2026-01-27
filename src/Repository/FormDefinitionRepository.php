@@ -33,7 +33,6 @@ class FormDefinitionRepository extends ServiceEntityRepository implements Search
             ->getResult()
         ;
 
-
         $formsIds = array_map(fn(FormDefinition $f) => $f->getId(), $forms);
         $fieldsByForms = $this->formFieldRepository->countByForms($formsIds);
         $submissionsByForms = $this->formSubmissionRepository->countByForms($formsIds);
@@ -41,8 +40,8 @@ class FormDefinitionRepository extends ServiceEntityRepository implements Search
         return array_map(
             fn(FormDefinition $form) => new FormWithStatistics(
                 $form,
-                $fieldsByForms[$form->getId()],
-                $submissionsByForms[$form->getId()],
+                $fieldsByForms[$form->getId()] ?? 0,
+                $submissionsByForms[$form->getId()] ?? 0,
             ),
             $forms,
         );

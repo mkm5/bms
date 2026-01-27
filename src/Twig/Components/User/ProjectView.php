@@ -2,7 +2,6 @@
 
 namespace App\Twig\Components\User;
 
-use App\Entity\Document;
 use App\Entity\Project;
 use App\Repository\DocumentRepository;
 use App\Repository\ProjectRepository;

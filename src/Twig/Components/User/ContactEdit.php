@@ -54,6 +54,7 @@ final class ContactEdit extends AbstractController
 
         $this->dispatchBrowserEvent('modal:close', ['id' => $this->modalName]);
         $this->emit('contact:update', ['contact' => $contact->getId()]);
+        $this->emit('listing:refresh');
         $this->viewContact = null;
         $this->resetForm();
     }

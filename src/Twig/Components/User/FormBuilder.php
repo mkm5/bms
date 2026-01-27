@@ -157,7 +157,9 @@ final class FormBuilder extends AbstractController
             $this->applyFieldOptions($field, $this->fieldOptions[$index] ?? []);
         }
 
-        if (!$formDefinition->getId()) $this->em->persist($formDefinition);
+        if (!$formDefinition->getId()) {
+            $this->em->persist($formDefinition);
+        }
         $this->em->flush();
 
         return $this->redirectToRoute('app_user_form_builder_edit', [

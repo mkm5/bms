@@ -29,7 +29,7 @@
             <tbody class="divide-y divide-gray-200 whitespace-nowrap">
                 {% if this.totalItems > 0 %}
                     {% for item in this.items %}
-                        <tr class="hover:bg-gray-50">{%- block table_row -%}{%- endblock table_row -%}</tr>
+                        <tr key="{{ item.id }}" class="hover:bg-gray-50">{%- block table_row -%}{%- endblock table_row -%}</tr>
                     {% endfor %}
                 {% else %}
                     <tr>

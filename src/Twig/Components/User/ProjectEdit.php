@@ -54,6 +54,7 @@ final class ProjectEdit extends AbstractController
 
         $this->dispatchBrowserEvent('modal:close', ['id' => $this->modalName]);
         $this->emit('project:update', ['project' => $project->getId()]);
+        $this->emit('listing:refresh');
         $this->viewProject = null;
         $this->resetForm();
     }
