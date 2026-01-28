@@ -50,7 +50,7 @@
         <twig:Elements:Td class="text-center">
             <twig:Elements:Pill
                 variant="{{ item.isActive ? 'default' : 'disabled' }}"
-                content="{{ item.isActive ? 'Active' : 'Inactive' }}"
+                content="{{ item.status.textName }}"
             />
         </twig:Elements:Td>
         <twig:Elements:Td class="text-center">{{- item.isAdmin ? 'Admin' : 'User' -}}</twig:Elements:Td>
@@ -64,7 +64,7 @@
                     <twig:ux:icon name="tabler:pencil" class="w-4 h-4" /> Edit
                 </twig:Elements:DropdownButton>
 
-                {%- if not item.isActive and not item.isRegistered -%}
+                {%- if not item.isRegistered -%}
                     <twig:Elements:DropdownButton
                         data-action="live#emit"
                         data-live-event-param="user:resend-registration-link"
@@ -72,17 +72,17 @@
                     >
                         <twig:ux:icon name="tabler:mail" class="w-4 h-4" /> Resend registration link
                     </twig:Elements:DropdownButton>
+                {%- else -%}
+                    <twig:Elements:DropdownButton
+                        data-action="live#emit"
+                        data-live-event-param="user:toggle-status"
+                        data-live-user-param="{{ item.id }}"
+                    >
+                        {%- set icon = item.isActive ? 'tabler:user-off' : 'tabler:user-share' -%}
+                        {%- set text = item.isActive ? 'Deactivate user' : 'Activate user' -%}
+                        <twig:ux:icon name="{{ icon }}" class="w-4 h-4" /> {{ text }}
+                    </twig:Elements:DropdownButton>
                 {%- endif -%}
-
-                <twig:Elements:DropdownButton
-                    data-action="live#emit"
-                    data-live-event-param="user:toggle-status"
-                    data-live-user-param="{{ item.id }}"
-                >
-                    {%- set icon = item.isActive ? 'tabler:user-off' : 'tabler:user-share' -%}
-                    {%- set text = item.isActive ? 'Deactivate user' : 'Activate user' -%}
-                    <twig:ux:icon name="{{ icon }}" class="w-4 h-4" /> {{ text }}
-                </twig:Elements:DropdownButton>
             </twig:Elements:Dropdown>
         </twig:Elements:Td>
     </twig:block>
