@@ -18,6 +18,9 @@ class TagAutocompleteField extends AbstractType
             'searchable_fields' => ['name'],
             'choice_label' => 'name',
             'multiple' => true,
+            'tom_select_options' => [
+                'dropdownParent' => 'body',
+            ],
         ]);
     }
 

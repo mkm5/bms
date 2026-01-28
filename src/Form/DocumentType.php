@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\DTO\DocumentCreate;
 use App\Form\Autocomplete\TagAutocompleteField;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -54,6 +55,7 @@ class DocumentType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'data_class' => DocumentCreate::class,
             'csrf_protection' => true,
             'validation_groups' => ['Default', 'files'],
         ]);
