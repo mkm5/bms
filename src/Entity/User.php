@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Config\UserStatus;
 use App\Repository\UserRepository;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -56,6 +57,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(enumType: UserStatus::class)]
     private UserStatus $status = UserStatus::PENDING;
+
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $lastLogin = null;
 
     public function __construct()
     {
@@ -244,5 +248,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function isRegistered(): bool
     {
         return !empty($self->password) && $self->status !== UserStatus::PENDING;
+    }
+
+    public function getLastLogin(): ?DateTimeImmutable
+    {
+        return $this->lastLogin;
+    }
+
+    public function setLastLogin(DateTimeImmutable $lastLogin): self
+    {
+        $this->lastLogin = $lastLogin;
+        return $this;
     }
 }

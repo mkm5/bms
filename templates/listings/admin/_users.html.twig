@@ -37,8 +37,9 @@
     <twig:block name="table_head">
         <twig:Elements:Th>Name</twig:Elements:Th>
         <twig:Elements:Th>Position</twig:Elements:Th>
-        <twig:Elements:Th class="text-center">Status</twig:Elements:Th>
+        <twig:Elements:Th>Last login</twig:Elements:Th>
         <twig:Elements:Th class="text-center">Role</twig:Elements:Th>
+        <twig:Elements:Th class="text-center">Status</twig:Elements:Th>
         <twig:Elements:Th class="text-right whitespace-nowrap w-8">Actions</twig:Elements:Th>
     </twig:block>
     <twig:block name="table_row">
@@ -47,13 +48,14 @@
             <div class="text-gray-400">{{ item.email }}</div>
         </twig:Elements:Td>
         <twig:Elements:Td>{{ item.position }}</twig:Elements:Td>
+        <twig:Elements:Td class="text">{{ item.lastLogin is empty ? '' : item.lastLogin|date('Y-m-d H:i') }}</twig:Elements:Td>
+        <twig:Elements:Td class="text-center">{{- item.isAdmin ? 'Admin' : 'User' -}}</twig:Elements:Td>
         <twig:Elements:Td class="text-center">
             <twig:Elements:Pill
                 variant="{{ item.isActive ? 'default' : 'disabled' }}"
                 content="{{ item.status.textName }}"
             />
         </twig:Elements:Td>
-        <twig:Elements:Td class="text-center">{{- item.isAdmin ? 'Admin' : 'User' -}}</twig:Elements:Td>
         <twig:Elements:Td class="text-gray-900 whitespace-nowrap text-right">
             <twig:Elements:Dropdown variant='short'>
                 <twig:Elements:DropdownButton
