@@ -1,0 +1,70 @@
+{% import "elements.html.twig" as c %}
+
+<div
+    {{ attributes.defaults({'data-controller': 'ticket-status'}) }}
+    class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden max-w-lg"
+>
+    <div class="px-6 py-4 border-b border-gray-200">
+        <h2 class="text-sm font-semibold text-gray-700 uppercase tracking-wider">Ticket Statuses</h2>
+    </div>
+
+    <div class="px-6 py-4 border-b border-gray-200">
+        <form
+            data-action="submit->live#action:prevent"
+            data-live-action-param="addStatus"
+            class="flex items-center gap-3"
+        >
+            <input
+                type="text"
+                data-model="newStatusName"
+                placeholder="New status name..."
+                class="{{ c._input('flex-1') }}"
+            >
+            <twig:Elements:Button type="submit" size="sm">Add</twig:Elements:Button>
+        </form>
+    </div>
+
+    <div
+        data-ticket-status-target="list"
+        class="divide-y divide-gray-200"
+    >
+        {% for statusWithCount in this.statusesWithCount %}
+            {%- set tickets = statusWithCount.tickets %}
+            {%- set status = statusWithCount.status -%}
+            <div
+                data-status-id="{{ status.id }}"
+                class="flex items-center gap-3 px-6 py-3 bg-white hover:bg-gray-50 transition-colors"
+            >
+                <div
+                    data-sortable-handle
+                    class="cursor-grab text-gray-400 hover:text-gray-600 active:cursor-grabbing"
+                >
+                    <twig:ux:icon name="tabler:grip-vertical" class="w-5 h-5" />
+                </div>
+
+                <div class="flex-1">
+                    <span class="flex-1 text-sm text-gray-900 font-medium mr-1">{{ status.name }}</span>
+                    <span class="text-xs text-gray-400">({{ tickets }} ticket{{ tickets != 1 ? 's' : '' }})</span>
+                </div>
+
+                {% if tickets == 0 %}
+                    <twig:Elements:Button
+                        data-action="live#action"
+                        data-live-action-param="removeStatus"
+                        data-live-status-id-param="{{ status.id }}"
+                        size="sm"
+                        variant="link"
+                        class="h-auto text-gray-400 hover:text-red-500 transition-colors"
+                        title="Remove status"
+                    >
+                        <twig:ux:icon name="tabler:trash" class="w-4 h-4" />
+                    </twig:Elements:Button>
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="px-6 py-8 text-center text-gray-500 text-sm">
+                No statuses defined yet. Add one above.
+            </div>
+        {% endfor %}
+    </div>
+</div>
