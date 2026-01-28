@@ -2,6 +2,7 @@
 
 namespace App\Service\User;
 
+use App\Config\UserStatus;
 use App\Entity\User;
 use LogicException;
 use RuntimeException;
@@ -47,7 +48,9 @@ final class UserFactory
         }
 
         $user->setRoles($isAdmin ? [User::ADMIN_ROLE, User::DEFAULT_ROLE] : [User::DEFAULT_ROLE]);
-        $user->setIsActive($isActive);
+
+        $statusIfNotIsActive = empty($password) ? UserStatus::PENDING : UserStatus::DISABLED;
+        $user->setStatus($isActive ? UserStatus::ACTIVE : $statusIfNotIsActive);
 
         $errors = $this->validator->validate($user);
         if (count($errors) > 0) {

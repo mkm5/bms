@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Config\UserStatus;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
@@ -34,7 +35,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
     public function findOneActiveByEmail(string $email): ?User
     {
-        return $this->findOneBy(['email' => $email, 'isActive' => true]);
+        return $this->findOneBy(['email' => $email, 'status' => UserStatus::ACTIVE]);
     }
 
     /** @return User[] */
@@ -64,7 +65,9 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         ;
 
         if (in_array('onlyActive', $params)) {
-            $qb->andWhere('u.isActive = true');
+            $qb->andWhere('u.status = :status')
+                ->setParameter('status', UserStatus::ACTIVE)
+            ;
         }
 
         if (in_array('onlyAdmins', $params)) {

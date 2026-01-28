@@ -2,11 +2,14 @@
 
 namespace App\Entity;
 
+use App\Config\UserStatus;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use LogicException;
+use SensitiveParameter;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -31,9 +34,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\Email(mode: Assert\Email::VALIDATION_MODE_HTML5_ALLOW_NO_TLD)]
     private ?string $email = null;
 
-    /**
-     * @var list<string> The user roles
-     */
+    /** @var string[] The user roles */
     #[ORM\Column(type: Types::JSON, options: ['jsonb' => true])]
     private array $roles = [];
 
@@ -49,14 +50,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $position = null;
 
-    #[ORM\Column]
-    private bool $isActive = false;
-
-    /**
-     * @var Collection<int, Project>
-     */
+    /** @var Collection<int, Project> */
     #[ORM\ManyToMany(targetEntity: Project::class, mappedBy: 'managers')]
     private Collection $managedProjects;
+
+    #[ORM\Column(enumType: UserStatus::class)]
+    private UserStatus $status = UserStatus::PENDING;
 
     public function __construct()
     {
@@ -134,8 +133,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->password;
     }
 
-    public function setPassword(string $password): self
+    public function setPassword(#[SensitiveParameter] string $password): self
     {
+        if (!$this->isRegistered()) {
+            $this->status = UserStatus::ACTIVE;
+        }
         $this->password = $password;
         return $this;
     }
@@ -183,22 +185,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function isActive(): bool
-    {
-        return $this->isActive;
-    }
-
-    public function setIsActive(bool $isActive): self
-    {
-        $this->isActive = $isActive;
-        return $this;
-    }
-
-    public function isRegistered(): bool
-    {
-        return !empty($this->password);
-    }
-
     public function getDisplayName(): string
     {
         $fn = $this->getFirstName() ?? '';
@@ -214,7 +200,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->managedProjects;
     }
 
-    public function addManagedProject(Project $project): static
+    public function addManagedProject(Project $project): self
     {
         if (!$this->managedProjects->contains($project)) {
             $this->managedProjects->add($project);
@@ -224,11 +210,39 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function removeManagedProject(Project $project): static
+    public function removeManagedProject(Project $project): self
     {
         if ($this->managedProjects->removeElement($project)) {
             $project->removeManager($this);
         }
         return $this;
+    }
+
+    public function getStatus(): UserStatus
+    {
+        return $this->status;
+    }
+
+    public function setStatus(UserStatus $status): self
+    {
+        if (($status === UserStatus::PENDING) === $this->isRegistered()) {
+            throw new LogicException($this->isRegistered()
+                ? 'Cannot change user status to "pending" after registration'
+                : 'User is not fully registered, cannot change status from "pending"'
+            );
+        }
+
+        $this->status = $status;
+        return $this;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->status === UserStatus::ACTIVE;
+    }
+
+    public function isRegistered(): bool
+    {
+        return !empty($self->password) && $self->status !== UserStatus::PENDING;
     }
 }

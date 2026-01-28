@@ -2,6 +2,7 @@
 
 namespace App\Controller\User\Security;
 
+use App\Config\UserStatus;
 use App\Entity\User;
 use App\Form\UserRegistrationFinalizeType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,8 +24,7 @@ final class RegisterController extends AbstractController
         EntityManagerInterface $em,
     ): Response
     {
-        if (!$signer->check($request->getUri())
-        || $user->isActive()) {
+        if (!$signer->check($request->getUri()) || $user->isActive()) {
             throw $this->createAccessDeniedException('This link is invalid or modified.');
         }
 
@@ -32,8 +32,9 @@ final class RegisterController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $user->setPassword($passwordHasher->hashPassword($user, $form->getData()['password']));
-            $user->setIsActive(true);
+            $plainPassword = $form->getData()['password'];
+            $user->setPassword($passwordHasher->hashPassword($user, $plainPassword));
+            $user->setStatus(UserStatus::ACTIVE);
             $em->flush();
 
             return $this->redirectToRoute('app_user_login');

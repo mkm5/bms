@@ -2,6 +2,7 @@
 
 namespace App\Twig\Components\Admin;
 
+use App\Config\UserStatus;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\SearchableRepositoryProvider;
@@ -43,11 +44,13 @@ final class UsersListing extends Listing
     public function userToggleStatus(#[LiveArg] int $user): void
     {
         /** @var User */
-        if (!($user = $this->userRepository->find($user))) {
+        $user = $this->userRepository->find($user);
+        if (!$user || !$user->isRegistered()) {
             return;
         }
 
-        $user->setIsActive(!$user->isActive());
+        $newStatus = $user->isActive() ? UserStatus::DISABLED : UserStatus::ACTIVE;
+        $user->setStatus($newStatus);
         $this->em->flush();
     }
 }
