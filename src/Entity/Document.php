@@ -30,19 +30,10 @@ class Document
     #[ORM\JoinColumn(name: 'current_version_id', nullable: true, onDelete: 'SET NULL')]
     private ?DocumentVersion $currentVersion = null;
 
-    /**
-     * @var Collection<int, DocumentVersion>
-     */
+    /** @var Collection<int, DocumentVersion> */
     #[ORM\OneToMany(targetEntity: DocumentVersion::class, mappedBy: 'document', cascade: ['persist', 'remove'], orphanRemoval: true)]
     #[ORM\OrderBy(['versionNumber' => 'DESC'])]
     private Collection $versions;
-
-    /**
-     * @var Collection<int, Tag>
-     */
-    #[ORM\ManyToMany(targetEntity: Tag::class)]
-    #[ORM\JoinTable(name: 'document_tag')]
-    private Collection $tags;
 
     #[ORM\Column(
         type: Types::TEXT,
@@ -56,7 +47,6 @@ class Document
     public function __construct()
     {
         $this->versions = new ArrayCollection();
-        $this->tags = new ArrayCollection();
     }
 
     public static function create(string $name, ?string $description = null): self
@@ -148,31 +138,5 @@ class Document
         }
 
         return $this;
-    }
-
-    /** @return Collection<int, Tag> */
-    public function getTags(): Collection
-    {
-        return $this->tags;
-    }
-
-    public function addTag(Tag $tag): self
-    {
-        if (!$this->tags->contains($tag)) {
-            $this->tags->add($tag);
-        }
-
-        return $this;
-    }
-
-    public function removeTag(Tag $tag): self
-    {
-        $this->tags->removeElement($tag);
-        return $this;
-    }
-
-    public function hasTag(Tag $tag): bool
-    {
-        return $this->tags->contains($tag);
     }
 }

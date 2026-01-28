@@ -14,8 +14,6 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
 
-use function Symfony\Component\String\u;
-
 class FileController extends AbstractController
 {
     public function __construct(

@@ -5,7 +5,6 @@ namespace App\Twig\Components\User;
 use App\Entity\Document;
 use App\Form\DocumentEditType;
 use App\Repository\DocumentRepository;
-use App\Repository\TagRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
@@ -31,12 +30,8 @@ final class DocumentEdit extends AbstractController
     #[LiveProp]
     public ?Document $document = null;
 
-    #[LiveProp]
-    public string $tagCreateModalName = 'tag-create';
-
     public function __construct(
         private readonly DocumentRepository $documentRepository,
-        private readonly TagRepository $tagRepository,
         private readonly EntityManagerInterface $em,
     ) {
     }
@@ -50,9 +45,7 @@ final class DocumentEdit extends AbstractController
     public function save(): void
     {
         $this->submitForm();
-
         $this->em->flush();
-
         $this->dispatchBrowserEvent('modal:close', ['id' => $this->modalName]);
         $this->emit('document:update', ['document' => $this->document->getId()]);
     }
@@ -67,23 +60,6 @@ final class DocumentEdit extends AbstractController
         }
 
         $this->dispatchBrowserEvent('modal:open', ['id' => $this->modalName]);
-        $this->resetForm();
-    }
-
-    #[LiveListener('tag:created')]
-    public function onTagCreated(#[LiveArg] int $tag): void
-    {
-        if (!($tag = $this->tagRepository->find($tag))) {
-            return;
-        }
-
-        $this->document->addTag($tag);
-
-        $currentTags = $this->formValues['tags'] ?? [];
-        if (!in_array($tag, $currentTags)) {
-            $this->formValues['tags'][] = $tag;
-        }
-
         $this->resetForm();
     }
 }
