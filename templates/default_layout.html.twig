@@ -34,40 +34,7 @@
             class="fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-200 flex flex-col sidebar-transition transform -translate-x-full lg:translate-x-0 lg:static shrink-0 h-full"
         >
             <div class="p-4 border-b border-gray-200 flex items-center gap-2">
-
-                {# User Menu #}
-                <div data-controller="dropdown" class="relative flex-1 min-w-0">
-                    <button
-                        data-action="click->dropdown#toggle"
-                        class="w-full flex items-center gap-2 p-1.5 -ml-1.5 rounded-lg hover:bg-gray-100 transition-colors text-left group focus:outline-none"
-                    >
-                        <div class="flex-1 min-w-0 overflow-hidden">
-                            <div class="text-sm font-semibold text-gray-900 truncate">
-                                {{ (app.user.firstName ~ ' ' ~ app.user.lastName)|trim }}
-                                <span class="text-gray-400">({{ app.user.isAdmin ? 'Admin' : 'User' }})</span>
-                            </div>
-                            <div class="text-sm text-gray-400">{{ app.user.email }}</div>
-                        </div>
-                        <twig:ux:icon
-                            name="tabler:chevron-down"
-                            class="text-gray-400 transition-transform duration-200 text-xs"
-                            data-dropdown-target="chevron"
-                        />
-                    </button>
-
-                    {# Dropdown Menu #}
-                    <div
-                        data-dropdown-target="menu"
-                        class="hidden fixed z-50 w-64 origin-top-left bg-white border border-gray-200 rounded-lg shadow-lg py-1 transform transition-all duration-200"
-                    >
-                        <a href="{{ path('app_user_settings') }}" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-black">
-                            <twig:ux:icon name="tabler:settings" class="text-gray-400" /> Settings
-                        </a>
-                        <a href="{{ path('app_user_logout') }}" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-red-600">
-                            <twig:ux:icon name="tabler:logout" class="text-gray-400" /> Logout
-                        </a>
-                    </div>
-                </div>
+                {%- include '_user_dropdown.html.twig' -%}
             </div>
 
             {# Navigation Items #}
