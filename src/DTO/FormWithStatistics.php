@@ -4,12 +4,17 @@ namespace App\DTO;
 
 use App\Entity\FormDefinition;
 
-class FormWithStatistics
+readonly class FormWithStatistics
 {
     public function __construct(
-        public readonly FormDefinition $form,
-        public readonly int $fields,
-        public readonly int $submissions,
+        public FormDefinition $form,
+        public int $fields,
+        public int $submissions,
     ) {
+    }
+
+    public function id(): int
+    {
+        return $this->form->getId();
     }
 }
