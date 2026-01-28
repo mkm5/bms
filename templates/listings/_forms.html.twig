@@ -31,6 +31,13 @@
         <twig:Elements:Td class="text-gray-900 whitespace-nowrap text-right">
             <twig:Elements:Button
                 variant="link"
+                href="{{ path('app_form_show', {id: item.form.id}) }}"
+            >
+                <twig:ux:icon name="tabler:forms" class="w-4 h-4" /> View
+            </twig:Elements:Button>
+
+            <twig:Elements:Button
+                variant="link"
                 href="{{ path('app_user_form_builder_edit', {id: item.form.id}) }}"
             >
                 <twig:ux:icon name="tabler:pencil" class="w-4 h-4" /> Edit
