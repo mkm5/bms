@@ -30,7 +30,7 @@ class ProjectRepository extends ServiceEntityRepository implements SearchableRep
             ->getResult()
         ;
 
-        return $this->buildSearchQuery($query, $params, $limit, $offset)
+        return $this->createQueryBuilder('p')
             ->join('p.managers', 'm')
             ->addSelect('m')
             ->andWhere('p.id in (:ids)')
@@ -58,17 +58,13 @@ class ProjectRepository extends ServiceEntityRepository implements SearchableRep
         ;
 
         if (!empty($query)) {
-            $qb
-                ->andWhere('LOWER(p.name) LIKE :query')
-                ->setParameter('query', '%' . strtolower($query) . '%')
-            ;
+            $qb->andWhere('LOWER(p.name) LIKE :query')
+                ->setParameter('query', '%' . strtolower($query) . '%');
         }
 
         if (!empty($params['onlyFinished']) && $params['onlyFinished']) {
-            $qb
-                ->andWhere('p.isFinished = :isFinished')
-                ->setParameter('isFinished', true)
-            ;
+            $qb->andWhere('p.isFinished = :isFinished')
+                ->setParameter('isFinished', true);
         }
 
         return $qb;
