@@ -18,7 +18,7 @@ class FormFieldEntryType extends AbstractType
     {
         $builder
             ->add('name', TextType::class, [
-                'label' => 'Field Name',
+                'label' => 'Name',
                 'empty_data' => '',
             ])
             ->add('helpText', TextareaType::class, [
@@ -32,7 +32,7 @@ class FormFieldEntryType extends AbstractType
             ])
             ->add('type', EnumType::class, [
                 'class' => FormFieldType::class,
-                'label' => 'Field Type',
+                'label' => 'Type',
                 'choice_label' => fn(FormFieldType $type) => $type->label(),
             ])
         ;

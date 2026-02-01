@@ -12,6 +12,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveArg;
@@ -33,10 +35,16 @@ final class FormBuilder extends AbstractController
     #[LiveProp(writable: true)]
     public array $fieldOptions = [];
 
+    private readonly PropertyAccessorInterface $propertyAccessor;
+
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly FormDefinitionFormBuilder $formDefinitionFormBuilder,
     ) {
+        $this->propertyAccessor = PropertyAccess
+            ::createPropertyAccessorBuilder()
+            ->getPropertyAccessor()
+        ;
     }
 
     public function mount(?FormDefinition $formDefinition = null): void
@@ -55,16 +63,21 @@ final class FormBuilder extends AbstractController
         return FormFieldType::cases();
     }
 
-    #[LiveAction]
-    public function addField(): void
+    private function defaultNewFieldFormValues(): array
     {
-        $index = count($this->formValues['fields'] ?? []);
-        $this->formValues['fields'][] = [
+        return [
             'name' => '',
             'helpText' => '',
             'isRequired' => false,
             'type' => FormFieldType::TEXT->value,
         ];
+    }
+
+    #[LiveAction]
+    public function addField(): void
+    {
+        $index = count($this->formValues['fields'] ?? []);
+        $this->formValues['fields'][] = $this->defaultNewFieldFormValues();
         $this->fieldOptions[$index] = [];
     }
 
@@ -96,27 +109,9 @@ final class FormBuilder extends AbstractController
     }
 
     #[LiveAction]
-    public function updateChoiceLabel(#[LiveArg] int $fieldIndex, #[LiveArg] int $choiceIndex, #[LiveArg] string $value): void
+    public function updateFieldOptions(#[LiveArg] string $accessPath, #[LiveArg] mixed $value): void
     {
-        $this->fieldOptions[$fieldIndex]['choices'][$choiceIndex]['label'] = $value;
-    }
-
-    #[LiveAction]
-    public function updateChoiceValue(#[LiveArg] int $fieldIndex, #[LiveArg] int $choiceIndex, #[LiveArg] string $value): void
-    {
-        $this->fieldOptions[$fieldIndex]['choices'][$choiceIndex]['value'] = $value;
-    }
-
-    #[LiveAction]
-    public function updateMultiple(#[LiveArg] int $fieldIndex, #[LiveArg] bool $value): void
-    {
-        $this->fieldOptions[$fieldIndex]['multiple'] = $value;
-    }
-
-    #[LiveAction]
-    public function updateExpanded(#[LiveArg] int $fieldIndex, #[LiveArg] bool $value): void
-    {
-        $this->fieldOptions[$fieldIndex]['expanded'] = $value;
+        $this->propertyAccessor->setValue($this->fieldOptions, $accessPath, $value);
     }
 
     #[LiveAction]
@@ -154,7 +149,10 @@ final class FormBuilder extends AbstractController
         $displayOrder = 0;
         foreach ($formDefinition->getFields() as $index => $field) {
             $field->setDisplayOrder($displayOrder++);
-            $this->applyFieldOptions($field, $this->fieldOptions[$index] ?? []);
+            $field->setOptions($this->getFieldOptions(
+                $field->getType(),
+                $this->fieldOptions[$index] ?? []
+            ));
         }
 
         if (!$formDefinition->getId()) {
@@ -175,11 +173,9 @@ final class FormBuilder extends AbstractController
         }
     }
 
-    private function applyFieldOptions(FormField $field, array $options): void
+    private function getFieldOptions(FormFieldType $fieldType, array $options): array
     {
-        $type = $field->getType();
-
-        $finalOptions = match ($type) {
+        return match ($fieldType) {
             FormFieldType::CHOICE => [
                 'choices' => $options['choices'] ?? [],
                 'multiple' => (bool) ($options['multiple'] ?? false),
@@ -193,8 +189,6 @@ final class FormBuilder extends AbstractController
             ],
             default => [],
         };
-
-        $field->setOptions($finalOptions);
     }
 
     public function getPreviewForm(): ?FormView
@@ -212,14 +206,14 @@ final class FormBuilder extends AbstractController
                 continue;
             }
 
-            $field = new FormField();
-            $field->setName($fieldData['name']);
-            $field->setHelpText($fieldData['helpText'] ?? null);
-            $field->setIsRequired((bool) ($fieldData['isRequired'] ?? false));
-            $field->setType(FormFieldType::tryFrom($fieldData['type'] ?? 'text') ?? FormFieldType::TEXT);
-
-            $this->applyFieldOptions($field, $this->fieldOptions[$index] ?? []);
-
+            $fieldType = FormFieldType::tryFrom($fieldData['type'] ?? 'text') ?? FormFieldType::TEXT;
+            $field = FormField::create(
+                $fieldData['name'],
+                $fieldType,
+                $fieldData['helpText'] ?? null,
+                (bool) ($fieldData['isRequired'] ?? false),
+                $this->getFieldOptions($fieldType, $this->fieldOptions[$index] ?? []),
+            );
             $previewDefinition->addField($field);
         }
 

@@ -42,6 +42,23 @@ class FormField
     #[ORM\JoinColumn(nullable: false)]
     private ?FormDefinition $formDefinition = null;
 
+    public static function create(
+        string $name,
+        FormFieldType $type,
+        ?string $helpText = null,
+        ?bool $isRequired = false,
+        array $options = [],
+    ): FormField
+    {
+        return (new self)
+            ->setName($name)
+            ->setType($type)
+            ->setHelpText($helpText)
+            ->setIsRequired($isRequired)
+            ->setOptions($options)
+        ;
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -52,7 +69,7 @@ class FormField
         return $this->name;
     }
 
-    public function setName(?string $name): self
+    public function setName(string $name): self
     {
         $this->name = $name;
         $this->updateLabel();
@@ -64,7 +81,7 @@ class FormField
         return $this->label;
     }
 
-    public function setLabel(?string $label): self
+    public function setLabel(string $label): self
     {
         $this->label = $label;
         return $this;
@@ -103,12 +120,12 @@ class FormField
         return $this;
     }
 
-    public function getOptions(): ?array
+    public function getOptions(): array
     {
         return $this->options;
     }
 
-    public function setOptions(?array $options): self
+    public function setOptions(array $options): self
     {
         $this->options = $options;
         return $this;

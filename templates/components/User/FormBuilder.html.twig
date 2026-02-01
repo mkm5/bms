@@ -28,8 +28,7 @@
                     data-action="live#action"
                     data-live-action-param="addField"
                 >
-                    <twig:ux:icon name="tabler:plus" class="w-4 h-4" />
-                    Add Field
+                    <twig:ux:icon name="tabler:plus" class="w-4 h-4" /> Add Field
                 </button>
             </div>
 
@@ -43,8 +42,8 @@
                         {# Field Header #}
                         <div class="flex items-start justify-between gap-4 mb-4">
                             <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
-                                {{ form_row(fieldForm.name, {label: 'Name'}) }}
-                                {{ form_row(fieldForm.type, {label: 'Type'}) }}
+                                {{ form_row(fieldForm.name) }}
+                                {{ form_row(fieldForm.type) }}
                                 <div class="flex items-center pt-6">
                                     {{ form_widget(fieldForm.isRequired) }}
                                     <label class="ml-2 text-sm text-gray-700">Required</label>
@@ -62,7 +61,7 @@
                         </div>
 
                         {# Help Text #}
-                        {{ form_row(fieldForm.helpText, {label: 'Help Text', attr: {rows: 2}}) }}
+                        {{ form_row(fieldForm.helpText) }}
 
                         {# Label Preview #}
                         {% set fieldName = this.formValues.fields[index].name|default('') %}
@@ -111,9 +110,8 @@
                                                 placeholder="Label"
                                                 class="flex-1 rounded-lg border-gray-300 text-sm"
                                                 data-action="change->live#action"
-                                                data-live-action-param="updateChoiceLabel"
-                                                data-live-field-index-param="{{ index }}"
-                                                data-live-choice-index-param="{{ choiceIndex }}"
+                                                data-live-action-param="updateFieldOptions"
+                                                data-live-access-path-param="[{{ index }}][choices][{{ choiceIndex }}][label]"
                                                 data-live-value-param=""
                                                 onchange="this.dataset.liveValueParam = this.value"
                                             />
@@ -123,9 +121,8 @@
                                                 placeholder="Value"
                                                 class="flex-1 rounded-lg border-gray-300 text-sm"
                                                 data-action="change->live#action"
-                                                data-live-action-param="updateChoiceValue"
-                                                data-live-field-index-param="{{ index }}"
-                                                data-live-choice-index-param="{{ choiceIndex }}"
+                                                data-live-action-param="updateFieldOptions"
+                                                data-live-access-path-param="[{{ index }}][choices][{{ choiceIndex }}][value]"
                                                 data-live-value-param=""
                                                 onchange="this.dataset.liveValueParam = this.value"
                                             />
@@ -152,8 +149,8 @@
                                             id="multiple_{{ index }}"
                                             {{ this.fieldOptions[index].multiple|default(false) ? 'checked' : '' }}
                                             data-action="change->live#action"
-                                            data-live-action-param="updateMultiple"
-                                            data-live-field-index-param="{{ index }}"
+                                            data-live-action-param="updateFieldOptions"
+                                            data-live-access-path-param="[{{ index }}][multiple]"
                                             data-live-value-param=""
                                             onchange="this.dataset.liveValueParam = this.checked"
                                             class="rounded border-gray-300 text-blue-600"
@@ -166,8 +163,8 @@
                                             id="expanded_{{ index }}"
                                             {{ this.fieldOptions[index].expanded|default(false) ? 'checked' : '' }}
                                             data-action="change->live#action"
-                                            data-live-action-param="updateExpanded"
-                                            data-live-field-index-param="{{ index }}"
+                                            data-live-action-param="updateFieldOptions"
+                                            data-live-access-path-param="[{{ index }}][expanded]"
                                             data-live-value-param=""
                                             onchange="this.dataset.liveValueParam = this.checked"
                                             class="rounded border-gray-300 text-blue-600"
@@ -188,9 +185,8 @@
                                             value="{{ this.fieldOptions[index].min|default(0) }}"
                                             class="w-full rounded-lg border-gray-300 text-sm"
                                             data-action="change->live#action"
-                                            data-live-action-param="updateRangeOption"
-                                            data-live-field-index-param="{{ index }}"
-                                            data-live-option-param="min"
+                                            data-live-action-param="updateFieldOptions"
+                                            data-live-access-path-param="[{{ index }}][min]"
                                             data-live-value-param=""
                                             onchange="this.dataset.liveValueParam = this.value"
                                         />
@@ -202,9 +198,8 @@
                                             value="{{ this.fieldOptions[index].max|default(100) }}"
                                             class="w-full rounded-lg border-gray-300 text-sm"
                                             data-action="change->live#action"
-                                            data-live-action-param="updateRangeOption"
-                                            data-live-field-index-param="{{ index }}"
-                                            data-live-option-param="max"
+                                            data-live-action-param="updateFieldOptions"
+                                            data-live-access-path-param="[{{ index }}][max]"
                                             data-live-value-param=""
                                             onchange="this.dataset.liveValueParam = this.value"
                                         />
@@ -216,9 +211,8 @@
                                             value="{{ this.fieldOptions[index].step|default(1) }}"
                                             class="w-full rounded-lg border-gray-300 text-sm"
                                             data-action="change->live#action"
-                                            data-live-action-param="updateRangeOption"
-                                            data-live-field-index-param="{{ index }}"
-                                            data-live-option-param="step"
+                                            data-live-action-param="updateFieldOptions"
+                                            data-live-access-path-param="[{{ index }}][step]"
                                             data-live-value-param=""
                                             onchange="this.dataset.liveValueParam = this.value"
                                         />
@@ -249,9 +243,9 @@
         <div class="mt-8 pt-8 border-t border-gray-200">
             <h3 class="text-lg font-medium text-gray-900 mb-4">Preview</h3>
             <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                {{ form_start(previewForm, {attr: {onsubmit: 'return false'}}) }}
+                {{ form_start(previewForm, {attr: {onsubmit: 'return false', autocomplete: 'off'}}) }}
                     {% for field in previewForm.children %}
-                        {{ form_row(field) }}
+                        {{ form_row(field, {attr: {autocomplete: 'off'}}) }}
                     {% endfor %}
                 {{ form_end(previewForm, {render_rest: false}) }}
             </div>

@@ -89,8 +89,8 @@ final readonly class FormDefinitionFormBuilder
 
     private function configureChoiceOptions(array &$options, array $fieldOptions): void
     {
-        $choices = $fieldOptions['choices'] ?? [];
-        $options['choices'] = $this->buildChoices($fieldOptions);
+        $choices = $this->processChoices($fieldOptions['choices'] ?? []);
+        $options['choices'] = array_column($choices, 'value', 'label');
         $options['multiple'] = $fieldOptions['multiple'] ?? false;
         $options['expanded'] = $fieldOptions['expanded'] ?? false;
 
@@ -121,12 +121,25 @@ final readonly class FormDefinitionFormBuilder
         ];
     }
 
-    private function buildChoices(array $fieldOptions): array
+    /**
+     * @param array{int, array{label: string, value: string|null}} $choices
+     * @return array<int, array{label: string, value: string}>
+     */
+    private function processChoices(array $choices): array
     {
-        $choices = [];
-        foreach ($fieldOptions['choices'] ?? [] as $choice) {
-            $choices[$choice['label']] = $choice['value'];
-        }
-        return $choices;
+        return array_map($this->processChoice(...), $choices);
+    }
+
+    /**
+     * @param array{label: string, value: string|null} $choice
+     * @return array{label: string, value: string|null}
+     */
+    private function processChoice(array $choice): array
+    {
+        return [
+            'label' => $choice['label'],
+            'value' => empty($choice['value']) && $choice['value'] !== '0'
+                ? $choice['label'] : $choice['value']
+        ];
     }
 }
