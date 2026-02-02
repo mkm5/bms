@@ -70,17 +70,19 @@
 {%- endblock form_errors -%}
 
 {%- block checkbox_row -%}
-    {%- set row_attr = row_attr|merge({class: row_attr.class|default(row_class|default('flex items-center gap-2'))}) -%}
+    {%- set row_attr = row_attr|merge({class: row_attr.class|default(row_class|default(''))}) -%}
     {%- set widget_attr = {} -%}
     {%- if help -%}
         {%- set widget_attr = {attr: {'aria-describedby': id ~ '_help'}} -%}
     {%- endif -%}
     <div{% with {attr: row_attr} %}{{ block('attributes') }}{% endwith %}>
-        {{- form_errors(form) -}}
-        <label class="flex items-center cursor-pointer relative" for="{{ form.vars.id }}">
-            {{- form_widget(form, widget_attr) -}}
-        </label>
-        {{- form_label(form) -}}
+        <div class="flex items-center gap-2">
+            {{- form_errors(form) -}}
+            <label class="flex items-center cursor-pointer relative" for="{{ form.vars.id }}">
+                {{- form_widget(form, widget_attr) -}}
+            </label>
+            {{- form_label(form) -}}
+        </div>
         {{- form_help(form) -}}
     </div>
 {%- endblock checkbox_row -%}
@@ -96,11 +98,6 @@
       </svg>
     </span>
 {%- endblock checkbox_widget -%}
-
-{# {%- block checkbox_label -%}
-    {%- set label_attr = label_attr|merge({class: (label_attr.class|default('cursor-pointer text-stone-600 text-sm'))}) -%}
-    {{- parent() -}}
-{%- endblock checkbox_label -%} #}
 
 {%- block radio_widget -%}
     {%-
