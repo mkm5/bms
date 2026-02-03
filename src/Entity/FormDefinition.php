@@ -90,7 +90,7 @@ class FormDefinition
 
         return match ($this->status) {
             FormStatus::DRAFT => $target === FormStatus::LIVE,
-            FormStatus::LIVE => $target === FormStatus::ARCHIVED && !$this->project?->isFinished(),
+            FormStatus::LIVE => $target === FormStatus::ARCHIVED,
             FormStatus::ARCHIVED => $target === FormStatus::LIVE && !$this->project?->isFinished(),
         };
     }

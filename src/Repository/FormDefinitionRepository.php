@@ -2,8 +2,10 @@
 
 namespace App\Repository;
 
+use App\Config\FormStatus;
 use App\DTO\FormWithStatistics;
 use App\Entity\FormDefinition;
+use App\Entity\Project;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -76,5 +78,18 @@ class FormDefinitionRepository extends ServiceEntityRepository implements Search
         }
 
         return $qb;
+    }
+
+    /** @return FormDefinition[] */
+    public function findNotArchivedByProject(Project $project): array
+    {
+        return $this->createQueryBuilder('fd')
+            ->andWhere('fd.project = :project')
+            ->andWhere('fd.status <> :status')
+            ->setParameter('project', $project)
+            ->setParameter('status', FormStatus::ARCHIVED)
+            ->getQuery()
+            ->getResult()
+        ;
     }
 }

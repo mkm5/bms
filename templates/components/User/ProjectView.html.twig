@@ -36,6 +36,9 @@
                             data-action="live#action"
                             data-live-action-param="toggleProjectStatus"
                             class="inline-flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 hover:cursor-pointer"
+                            data-confirmation-handler-target="action"
+                            data-confirmation-enabled="{{ not project.isFinished ? 'true' : 'false' }}"
+                            data-confirmation-message="Marking this project as finished will archive all its forms. Continue?"
                         >
                             {% if project.isFinished %}
                                 <twig:ux:icon name="tabler:player-play" class="w-4 h-4" /> Mark as active

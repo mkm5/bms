@@ -3,9 +3,13 @@
 namespace App\Twig\Components\User;
 
 use App\Entity\Project;
+use App\Event\ProjectFinishedEvent;
 use App\Repository\DocumentRepository;
 use App\Repository\ProjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveArg;
@@ -15,7 +19,7 @@ use Symfony\UX\LiveComponent\ComponentToolsTrait;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
 
 #[AsLiveComponent]
-final class ProjectView
+final class ProjectView extends AbstractController
 {
     use ComponentToolsTrait;
     use DefaultActionTrait;
@@ -30,6 +34,7 @@ final class ProjectView
         private readonly ProjectRepository $projectRepository,
         private readonly DocumentRepository $documentRepository,
         private readonly EntityManagerInterface $em,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -42,10 +47,16 @@ final class ProjectView
     }
 
     #[LiveAction]
-    public function toggleProjectStatus(): void
+    public function toggleProjectStatus(): RedirectResponse
     {
         $this->project->setIsFinished(!$this->project->isFinished());
+        if ($this->project->isFinished()) {
+            $this->eventDispatcher->dispatch(new ProjectFinishedEvent($this->project));
+        }
+
         $this->em->flush();
+
+        return $this->redirectToRoute('app_user_project_view', ['id' => $this->project->getId()]);
     }
 
     #[LiveAction]
