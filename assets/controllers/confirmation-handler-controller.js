@@ -12,14 +12,13 @@ export default class extends Controller {
 
     connect() {
         this.confirmBeforeExecution = this.confirmBeforeExecution.bind(this);
-        this.elementTargets.forEach(target => {
-            console.log(target);
+        this.actionTargets.forEach(target => {
             target.addEventListener('click', this.confirmBeforeExecution);
         });
     }
 
     disconnect() {
-        this.requireConfirmationTargets.forEach(target => {
+        this.actionTargets.forEach(target => {
             target.removeEventListener('click', this.confirmBeforeExecution);
         });
     }
