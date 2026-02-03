@@ -17,7 +17,7 @@ class FormSubmission
     private ?int $id = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?FormDefinition $form = null;
 
     #[ORM\Column(type: Types::JSON, options: ['jsonb' => true])]

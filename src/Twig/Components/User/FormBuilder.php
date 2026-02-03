@@ -141,6 +141,10 @@ final class FormBuilder extends AbstractController
     #[LiveAction]
     public function save(): RedirectResponse
     {
+        if ($this->formDefinition->getId() && !$this->formDefinition->canEdit()) {
+            throw $this->createAccessDeniedException('This form can no longer be edited.');
+        }
+
         $this->submitForm();
 
         /** @var FormDefinition */

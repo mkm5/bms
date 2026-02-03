@@ -39,7 +39,7 @@ class FormField
     private int $displayOrder = 0;
 
     #[ORM\ManyToOne(inversedBy: 'fields')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?FormDefinition $formDefinition = null;
 
     public static function create(

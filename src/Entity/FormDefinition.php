@@ -2,11 +2,13 @@
 
 namespace App\Entity;
 
+use App\Config\FormStatus;
 use App\Repository\FormDefinitionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use LogicException;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: FormDefinitionRepository::class)]
@@ -16,6 +18,9 @@ class FormDefinition
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
+
+    #[ORM\Column(enumType: FormStatus::class)]
+    private FormStatus $status = FormStatus::DRAFT;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
@@ -30,7 +35,12 @@ class FormDefinition
     private ?Project $project = null;
 
     /** @var Collection<int, FormField> */
-    #[ORM\OneToMany(targetEntity: FormField::class, mappedBy: 'formDefinition', orphanRemoval: true, cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(
+        targetEntity: FormField::class,
+        mappedBy: 'formDefinition',
+        orphanRemoval: true,
+        cascade: ['persist', 'remove']
+    )]
     #[ORM\OrderBy(['displayOrder' => 'ASC'])]
     private Collection $fields;
 
@@ -42,6 +52,47 @@ class FormDefinition
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function setStatus(FormStatus $status): self
+    {
+        if (!$this->canTransitionTo($status)) {
+            throw new LogicException(sprintf(
+                'Cannot transition form status from %s to %s',
+                $this->status->name,
+                $status->name,
+            ));
+        }
+        $this->status = $status;
+        return $this;
+    }
+
+    public function getStatus(): FormStatus
+    {
+        return $this->status;
+    }
+
+    public function canEdit(): bool
+    {
+        return $this->status === FormStatus::DRAFT;
+    }
+
+    public function canSubmit(): bool
+    {
+        return $this->status === FormStatus::LIVE;
+    }
+
+    public function canTransitionTo(FormStatus $target): bool
+    {
+        if ($target === $this->status) {
+            return false;
+        }
+
+        return match ($this->status) {
+            FormStatus::DRAFT => $target === FormStatus::LIVE,
+            FormStatus::LIVE => $target === FormStatus::ARCHIVED && !$this->project?->isFinished(),
+            FormStatus::ARCHIVED => $target === FormStatus::LIVE && !$this->project?->isFinished(),
+        };
     }
 
     public function getName(): ?string

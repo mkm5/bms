@@ -21,6 +21,10 @@ final class FormController extends AbstractController
         EntityManagerInterface $em,
     ): Response
     {
+        if (!$formDefinition->canSubmit()) {
+            throw $this->createNotFoundException('Form not found');
+        }
+
         $form = $formBuilder->createForm($formDefinition);
         $form->handleRequest($request);
 

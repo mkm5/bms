@@ -1,7 +1,7 @@
 <twig:Common:Listing entityClassName="{{ entityClassName }}"  {{ ...(formsListingProps ?? {}) }}>
     <twig:block name="headers_action_right">
         <twig:Elements:Button href="{{ path('app_user_form_builder_new') }}">
-            <twig:ux:icon name="tabler:forms" class="mr-2"/>New Form
+            <twig:ux:icon name="tabler:forms" class="mr-2"/> New Form
         </twig:Elements:Button>
     </twig:block>
     <twig:block name="table_head">
@@ -9,6 +9,7 @@
         {%- if not this.hasParam('project') -%}
         <twig:Elements:Th>Project</twig:Elements:Th>
         {%- endif -%}
+        <twig:Elements:Th>Status</twig:Elements:Th>
         <twig:Elements:Th>Fields</twig:Elements:Th>
         <twig:Elements:Th>Submissions</twig:Elements:Th>
         <twig:Elements:Th class="text-right whitespace-nowrap w-8">Actions</twig:Elements:Th>
@@ -21,27 +22,74 @@
         </twig:Elements:Td>
         {%- if not this.hasParam('project') -%}
         <twig:Elements:Td>
-            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
-                {{- item.form.project.name -}}
-            </span>
+            <twig:Elements:Pill variant="blue" content="{{ item.form.project.name }}"/>
         </twig:Elements:Td>
         {%- endif -%}
+        <twig:Elements:Td>
+            {%- set formStatusEnum = enum('App\\Config\\FormStatus') -%}
+            {%- set variant = item.form.status == formStatusEnum.LIVE
+                    ? 'green'
+                    : (item.form.status == formStatusEnum.ARCHIVED ? 'yellow' : 'default')
+            -%}
+            <twig:Elements:Pill variant="{{ variant }}" content="{{ item.form.status.name|title }}" />
+        </twig:Elements:Td>
         <twig:Elements:Td>{{ item.fields }}</twig:Elements:Td>
         <twig:Elements:Td>{{ item.submissions }} </twig:Elements:Td>
         <twig:Elements:Td class="text-gray-900 whitespace-nowrap text-right">
-            <twig:Elements:Button
-                variant="link"
-                href="{{ path('app_form_show', {id: item.form.id}) }}"
-            >
-                <twig:ux:icon name="tabler:forms" class="w-4 h-4" /> View
-            </twig:Elements:Button>
+            {%- set formStatusEnum = enum('App\\Config\\FormStatus') -%}
 
-            <twig:Elements:Button
-                variant="link"
-                href="{{ path('app_user_form_builder_edit', {id: item.form.id}) }}"
-            >
-                <twig:ux:icon name="tabler:pencil" class="w-4 h-4" /> Edit
-            </twig:Elements:Button>
+            {% if item.form.canEdit %}
+                <twig:Elements:Button
+                    variant="link"
+                    href="{{ path('app_user_form_builder_edit', {id: item.form.id}) }}"
+                >
+                    <twig:ux:icon name="tabler:pencil" class="w-4 h-4" /> Edit
+                </twig:Elements:Button>
+
+                <form
+                    class="inline"
+                    method="post"
+                    action="{{ path('app_user_form_status', {id: item.form.id, status: formStatusEnum.LIVE.name}) }}"
+                    onsubmit="return confirm('Publishing will make this form live and prevent further editing. Continue?')"
+                >
+                    <twig:Elements:Button type="submit" variant="link">
+                        <twig:ux:icon name="tabler:send" class="w-4 h-4" /> Publish
+                    </twig:Elements:Button>
+                </form>
+            {% endif %}
+
+            {% if item.form.canSubmit %}
+                <twig:Elements:Button
+                    variant="link"
+                    href="{{ path('app_form_show', {id: item.form.id}) }}"
+                >
+                    <twig:ux:icon name="tabler:forms" class="w-4 h-4" /> View
+                </twig:Elements:Button>
+            {% endif %}
+
+            {% if item.form.status == formStatusEnum.LIVE and not item.form.project.isFinished %}
+                <form
+                    class="inline"
+                    method="post"
+                    action="{{ path('app_user_form_status', {id: item.form.id, status: formStatusEnum.ARCHIVED.name}) }}"
+                >
+                    <twig:Elements:Button type="submit" variant="link">
+                        <twig:ux:icon name="tabler:archive" class="w-4 h-4" /> Archive
+                    </twig:Elements:Button>
+                </form>
+            {% endif %}
+
+            {% if item.form.status == formStatusEnum.ARCHIVED and not item.form.project.isFinished %}
+                <form
+                    class="inline"
+                    method="post"
+                    action="{{ path('app_user_form_status', {id: item.form.id, status: formStatusEnum.LIVE.name}) }}"
+                >
+                    <twig:Elements:Button type="submit" variant="link">
+                        <twig:ux:icon name="tabler:archive-off" class="w-4 h-4" /> Unarchive
+                    </twig:Elements:Button>
+                </form>
+            {% endif %}
         </twig:Elements:Td>
     </twig:block>
     <twig:block name="post_table">
