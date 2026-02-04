@@ -4,15 +4,11 @@ export default class extends Controller {
     static targets = ['menu', 'chevron'];
 
     static values = {
-        side: {
-            type: String,
-            default: 'left', /** left|right */
-        },
+        triggerAsZero: { type: Boolean, default: false },
+        side: { type: String, default: 'left' /** left|right */ },
     };
 
     connect() {
-        this.orignalParent = this.menuTarget.parentElement;
-        this.originalMenu = this.menuTarget;
         this.clickOutsideHandler = this.clickOutside.bind(this);
         document.addEventListener('click', this.clickOutsideHandler);
     }
@@ -22,51 +18,54 @@ export default class extends Controller {
     }
 
     toggle(event) {
-        const isOpening = this.originalMenu.classList.contains('hidden');
+        const isOpening = this.menuTarget.classList.contains('hidden');
 
-        if (isOpening) this.show(event, this.originalMenu);
-        else this.close(event, this.originalMenu);
+        if (isOpening) {
+            this.positionMenu(event.currentTarget);
+        }
+
+        this.menuTarget.classList.toggle('hidden');
 
         if (this.hasChevronTarget) {
             this.chevronTarget.classList.toggle('rotate-180');
         }
     }
 
-    show(event, menu) {
-        document.body.appendChild(menu);
+    positionMenu(trigger) {
+        const menu = this.menuTarget;
+        const { left, right, top, bottom } = trigger.getBoundingClientRect();
+
+        // Menu must be shown off-screen to measure its width
+        menu.style.visibility = 'hidden';
         menu.classList.remove('hidden');
-        menu.classList.add('fixed');
-
-        const buttonRect = event.currentTarget.getBoundingClientRect();
         const menuWidth = menu.offsetWidth;
-        const positionX = this.sideValue === 'right'
-            ? buttonRect.left
-            : buttonRect.right - menuWidth;
-        menu.style.left = `${positionX}px`;
-        menu.style.top = `${buttonRect.bottom}px`;
+        const menuHeight = menu.offsetHeight;
+        menu.classList.add('hidden');
+        menu.style.visibility = '';
 
-        if (positionX + menuWidth > window.innerWidth) {
-            menu.style.left = `${window.innerWidth - menuWidth}px`;
-        }
+        let positionX = this.sideValue === 'right' ? left : right - menuWidth;
+        positionX -= (this.triggerAsZeroValue ? menuWidth : 0);
+        positionX = Math.max(0, Math.min(positionX, window.innerWidth - menuWidth));
+
+        const spaceBelow = window.innerHeight - bottom;
+        const positionY = spaceBelow >= menuHeight ? bottom + 4 : top - menuHeight - 4;
+
+        menu.style.left = `${positionX}px`;
+        menu.style.top = `${positionY}px`;
     }
 
     clickOutside(event) {
         if (!this.element.contains(event.target)) {
-            this.close(event, this.originalMenu);
+            this.close();
         }
     }
 
-    close(event, menu) {
-        if (menu.classList.contains('hidden')) {
-            return;
-        }
-
-        menu.classList.add('hidden');
-
-        if (this.orignalParent) {
-            this.orignalParent.appendChild(menu);
-            menu.style.top = null;
-            menu.style.left = null;
+    close() {
+        if (!this.menuTarget.classList.contains('hidden')) {
+            this.menuTarget.classList.add('hidden');
+            if (this.hasChevronTarget) {
+                this.chevronTarget.classList.remove('rotate-180');
+            }
         }
     }
 }
