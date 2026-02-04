@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use LogicException;
 
 #[ORM\Entity(repositoryClass: TicketRepository::class)]
 class Ticket
@@ -30,21 +31,20 @@ class Ticket
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
-    /**
-     * @var Collection<int, Tag>
-     */
+    /** @var Collection<int, Tag> */
     #[ORM\ManyToMany(targetEntity: Tag::class)]
     #[ORM\OrderBy(['id' => 'ASC'])]
     private Collection $tags;
 
-    /**
-     * @var Collection<int, TicketTask>
-     */
+    /** @var Collection<int, TicketTask> */
     #[ORM\OneToMany(targetEntity: TicketTask::class, mappedBy: 'ticket', orphanRemoval: true, cascade: ['persist'])]
     private Collection $tasks;
 
     #[ORM\Column(options: ['default' => 0])]
     private int $displayOrder = 0;
+
+    #[ORM\Column(options: ['default' => false])]
+    private bool $isArchived = false;
 
     public function __construct()
     {
@@ -184,6 +184,21 @@ class Ticket
     public function setDisplayOrder(int $displayOrder): self
     {
         $this->displayOrder = $displayOrder;
+        return $this;
+    }
+
+    public function isArchived(): bool
+    {
+        return $this->isArchived;
+    }
+
+    public function setIsArchived(bool $isArchived): self
+    {
+        if (!$isArchived && $this->project->isFinished()) {
+            throw new LogicException('Cannot unarchive ticket of finished project');
+        }
+
+        $this->isArchived = $isArchived;
         return $this;
     }
 }

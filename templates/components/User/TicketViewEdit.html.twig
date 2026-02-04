@@ -51,6 +51,7 @@
                                     data-action="live#action"
                                     data-live-action-param="debounce(300)|toggleTask"
                                     data-live-task-id-param="{{ task.id }}"
+                                    {%- if viewTicket.project.finished -%}disabled{%- endif -%}
                                 >
                                     {% if task.isFinished %}
                                         <twig:ux:icon name="tabler:circle-check-filled" class="w-5 h-5 text-green-500" />
@@ -69,6 +70,7 @@
                 {% endif %}
             </div>
 
+            {%- if not viewTicket.project.finished -%}
             <div class="flex justify-end pt-4 border-t border-gray-200">
                 <twig:Elements:Button
                     data-action="live#emit"
@@ -78,6 +80,7 @@
                     <twig:ux:icon name="tabler:pencil" class="mr-2" />Edit
                 </twig:Elements:Button>
             </div>
+            {%- endif -%}
         </div>
     {% elseif status == 'edit' %}
         {{ form_start(form, {

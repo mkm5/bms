@@ -7,9 +7,11 @@ use App\Entity\TicketTask;
 use App\Form\TicketType;
 use App\Repository\TagRepository;
 use App\Repository\TicketRepository;
+use App\Security\Voter\TicketVoter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveArg;
@@ -47,15 +49,16 @@ final class TicketViewEdit extends AbstractController
 
     protected function instantiateForm(): FormInterface
     {
-        // if (null === $this->viewTicket && 'view' === $this->status) {
-        //     return $this->createFormBuilder()->getForm();
-        // }
         return $this->createForm(TicketType::class, $this->viewTicket);
     }
 
     #[LiveAction]
     public function save(): void
     {
+        if ($this->viewTicket->getId()) {
+            $this->denyAccessUnlessGranted(TicketVoter::EDIT, $this->viewTicket);
+        }
+
         $this->submitForm();
 
         /** @var Ticket */
@@ -68,6 +71,7 @@ final class TicketViewEdit extends AbstractController
 
         $this->dispatchBrowserEvent('modal:close', ['id' => $this->editModalName]);
         $this->emit('ticket:update', ['ticket' => $ticket->getId()]);
+        $this->emit('listing:refresh');
         $this->viewTicket = null;
         $this->resetForm();
     }
@@ -85,6 +89,7 @@ final class TicketViewEdit extends AbstractController
             throw new \ValueError('Ticket with id "'.($ticket).'" does not exist');
         }
 
+        $this->denyAccessUnlessGranted(TicketVoter::EDIT, $this->viewTicket);
         $this->dispatchBrowserEvent('modal:open', ['id' => $this->editModalName]);
         $this->resetForm();
     }
@@ -105,19 +110,21 @@ final class TicketViewEdit extends AbstractController
     #[LiveAction]
     public function addTask(): void
     {
+        $this->denyAccessUnlessGranted(TicketVoter::EDIT, $this->viewTicket);
         $this->formValues['tasks'][] = [];
     }
 
     #[LiveAction]
     public function removeTask(#[LiveArg] int $index): void
     {
+        $this->denyAccessUnlessGranted(TicketVoter::EDIT, $this->viewTicket);
         unset($this->formValues['tasks'][$index]);
     }
 
     #[LiveAction]
     public function toggleTask(#[LiveArg] int $taskId): void
     {
-        if (!$this->viewTicket) {
+        if (!$this->viewTicket || $this->getAccessDecision(TicketVoter::EDIT, $this->viewTicket)) {
             return;
         }
 
