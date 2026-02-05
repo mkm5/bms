@@ -7,5 +7,9 @@
 {% block header_extended %}{% endblock %}
 
 {% block content %}
-    <twig:User:ProjectView :project="project" :formListingConfig="formListingConfig" />
+    <twig:User:ProjectView
+        :project="project"
+        :formListingConfig="formListingConfig"
+        :ticketListingConfig="ticketListingConfig"
+    />
 {% endblock %}

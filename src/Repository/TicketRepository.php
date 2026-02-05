@@ -38,7 +38,7 @@ class TicketRepository extends ServiceEntityRepository implements SearchableRepo
     }
 
     /** @return Ticket[] */
-    public function findAllForKanban(): array
+    public function findAllNonArchivedForKanban(): array
     {
         return $this->createQueryBuilder('t')
             ->leftJoin('t.project', 'p')
@@ -47,6 +47,7 @@ class TicketRepository extends ServiceEntityRepository implements SearchableRepo
             ->addSelect('tag')
             ->leftJoin('t.status', 's')
             ->addSelect('s')
+            ->where('t.isArchived = false')
             ->addOrderBy('t.displayOrder', 'ASC')
             ->getQuery()
             ->getResult()
@@ -71,7 +72,7 @@ class TicketRepository extends ServiceEntityRepository implements SearchableRepo
             ->where('t.project = :project')
             ->setParameter('project', $project)
             ->getQuery()
-            ->getArrayResult()
+            ->getResult()
         ;
     }
 
@@ -144,6 +145,12 @@ class TicketRepository extends ServiceEntityRepository implements SearchableRepo
             ->setMaxResults($limit)
             ->setFirstResult($limit ? $offset : null)
         ;
+
+        if (key_exists('project', $params)) {
+            $qb->andWhere('t.project = :project')
+                ->setParameter('project', $params['project'])
+            ;
+        }
 
         if ($query !== null && $query !== '') {
             $qb->andWhere('t.title LIKE :query OR t.description LIKE :query OR s.name LIKE :query')

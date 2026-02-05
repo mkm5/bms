@@ -36,9 +36,7 @@ class ProjectAutocompleteField extends AbstractType
 
         if (!empty($query)) {
             $qb
-                ->andWhere(
-                    $qb->expr()->like('LOWER(entity.name)', ':filter')
-                )
+                ->andWhere('LOWER(entity.name) LIKE :filter')
                 ->setParameter('filter', '%' . strtolower($query) . '%')
             ;
         }

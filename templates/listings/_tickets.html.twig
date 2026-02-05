@@ -40,13 +40,27 @@
                     <twig:ux:icon name="tabler:ticket" class="w-4 h-4" /> View
                 </twig:Elements:DropdownButton>
 
-                {%- if not item.ticket.project.finished -%}
+                {%- if is_granted_for_user(app.user, 'TICKET_EDIT', item.ticket) -%}
                     <twig:Elements:DropdownButton
                         data-action="live#emit"
                         data-live-event-param="ticket:edit"
                         data-live-ticket-param="{{ item.ticket.id }}"
                     >
                         <twig:ux:icon name="tabler:pencil" class="w-4 h-4" /> Edit
+                    </twig:Elements:DropdownButton>
+                {%- endif -%}
+
+                {%- if is_granted_for_user(app.user, 'TICKET_ARCHIVE', item.ticket) -%}
+                    <twig:Elements:DropdownButton
+                        data-action="live#emit"
+                        data-live-event-param="ticket:toggle-archive"
+                        data-live-ticket-param="{{ item.ticket.id }}"
+                    >
+                        {% if item.ticket.archived %}
+                            <twig:ux:icon name="tabler:archive-off" class="w-4 h-4" /> Unarchive
+                        {% else %}
+                            <twig:ux:icon name="tabler:archive" class="w-4 h-4" /> Archive
+                        {% endif %}
                     </twig:Elements:DropdownButton>
                 {%- endif -%}
             </twig:Elements:Dropdown>

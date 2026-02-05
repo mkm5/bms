@@ -201,4 +201,9 @@ class Ticket
         $this->isArchived = $isArchived;
         return $this;
     }
+
+    public function isEditable(): bool
+    {
+        return !$this->isArchived && !$this->project->isFinished();
+    }
 }

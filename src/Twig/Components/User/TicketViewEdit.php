@@ -7,10 +7,13 @@ use App\Entity\TicketTask;
 use App\Form\TicketType;
 use App\Repository\TagRepository;
 use App\Repository\TicketRepository;
+use App\Repository\TicketTaskRepository;
 use App\Security\Voter\TicketVoter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
@@ -20,6 +23,7 @@ use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\LiveComponent\ComponentToolsTrait;
 use Symfony\UX\LiveComponent\ComponentWithFormTrait;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
+use ValueError;
 
 #[AsLiveComponent]
 final class TicketViewEdit extends AbstractController
@@ -43,6 +47,7 @@ final class TicketViewEdit extends AbstractController
     public function __construct(
         private readonly TagRepository $tagRepository,
         private readonly TicketRepository $ticketRepository,
+        private readonly TicketTaskRepository $taskRepository,
         private readonly EntityManagerInterface $em,
     ) {
     }
@@ -64,9 +69,6 @@ final class TicketViewEdit extends AbstractController
         /** @var Ticket */
         $ticket = $this->getForm()->getData();
         $this->em->persist($ticket);
-        foreach ($ticket->getTasks() as $task) {
-            $this->em->persist($task);
-        }
         $this->em->flush();
 
         $this->dispatchBrowserEvent('modal:close', ['id' => $this->editModalName]);
@@ -108,6 +110,21 @@ final class TicketViewEdit extends AbstractController
     }
 
     #[LiveAction]
+    #[LiveListener('ticket:toggle-archive')]
+    public function toggleArchive(#[LiveArg] int $ticket): void
+    {
+        $ticket = $this->ticketRepository->find($ticket);
+        if (!$ticket || !$this->getAccessDecision(TicketVoter::ARCHIVE, $ticket)) {
+            return;
+        }
+
+        $ticket->setIsArchived(!$ticket->isArchived());
+        $this->em->flush();
+        $this->emit('ticket:update', ['ticket' => $ticket->getId()]);
+        $this->emit('listing:refresh');
+    }
+
+    #[LiveAction]
     public function addTask(): void
     {
         $this->denyAccessUnlessGranted(TicketVoter::EDIT, $this->viewTicket);
@@ -121,32 +138,25 @@ final class TicketViewEdit extends AbstractController
         unset($this->formValues['tasks'][$index]);
     }
 
+
     #[LiveAction]
     public function toggleTask(#[LiveArg] int $taskId): void
     {
-        if (!$this->viewTicket || $this->getAccessDecision(TicketVoter::EDIT, $this->viewTicket)) {
+        $this->denyAccessUnlessGranted(TicketVoter::EDIT, $this->viewTicket);
+        if (!($task = $this->taskRepository->findByIdAndTicket($taskId, $this->viewTicket))) {
             return;
         }
 
-        /** @var TicketTask */
-        foreach ($this->viewTicket->getTasks() as $task) {
-            if ($task->getId() === $taskId) {
-                $task->toggleFinished();
-                $this->em->flush();
-
-                /**
-                 * NOTE:
-                 * LiveComponent tries to hydrate entities from dehydrated state, not fresh from DB.
-                 * It is necessary to force a re-fetch.
-                 */
-                $this->resetForm();
-            }
-        }
+        $task->toggleFinished();
+        $this->em->flush();
+        // NOTE: Need re-fetch, else data will be diplayed from already dehydrated state
+        $this->resetForm();
     }
 
     #[LiveListener('tag:created')]
     public function onTagCreated(#[LiveArg] int $tag): void
     {
+        $this->denyAccessUnlessGranted(TicketVoter::EDIT, $this->viewTicket);
         if (!($tag = $this->tagRepository->find($tag))) {
             return;
         }

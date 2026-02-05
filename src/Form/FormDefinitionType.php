@@ -10,6 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class FormDefinitionType extends AbstractType
 {
@@ -27,6 +28,14 @@ class FormDefinitionType extends AbstractType
             ])
             ->add('project', ProjectAutocompleteField::class, [
                 'label' => 'Project',
+                'required' => true,
+                'multiple' => false,
+                'constraints' => [
+                    new Assert\Expression(
+                        'value === null or not value.isFinished()',
+                        'Project must not be finished',
+                    ),
+                ],
             ])
             ->add('fields', CollectionType::class, [
                 'entry_type' => FormFieldEntryType::class,
@@ -39,8 +48,6 @@ class FormDefinitionType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
-            'data_class' => FormDefinition::class,
-        ]);
+        $resolver->setDefaults(['data_class' => FormDefinition::class]);
     }
 }

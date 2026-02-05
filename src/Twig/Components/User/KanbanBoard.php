@@ -45,13 +45,12 @@ final class KanbanBoard extends AbstractController
     /** @return Ticket[] */
     public function getTickets(): array
     {
-        return $this->tickets ??= $this->ticketRepository->findAllForKanban();
+        return $this->tickets ??= $this->ticketRepository->findAllNonArchivedForKanban();
     }
 
     #[LiveListener('ticket:update')]
     public function onTicketUpdate(#[LiveArg] int $ticket): void
     {
-        // Refresh data
     }
 
     #[LiveAction]

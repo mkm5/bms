@@ -127,6 +127,13 @@
                 {%- include 'listings/_forms.html.twig' %}
             {%- endwith -%}
         </div>
+
+        <div>
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Tickets</h2>
+            {%- with ticketListingConfig only -%}
+                {%- include 'listings/_tickets.html.twig' -%}
+            {%- endwith -%}
+        </div>
     </div>
 
     <twig:Elements:Modal name="project">

@@ -4,6 +4,7 @@ namespace App\Controller\User;
 
 use App\Entity\FormDefinition;
 use App\Entity\Project;
+use App\Entity\Ticket;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;;
 use Symfony\Component\Routing\Attribute\Route;
@@ -30,9 +31,14 @@ final class ProjectController extends AbstractController
                 'entityClassName' => FormDefinition::class,
                 'formsListingProps' => [
                     'exposeSearch' => false,
-                    'params' => [
-                        'project' => $project->getId(),
-                    ],
+                    'params' => ['project' => $project->getId()],
+                ],
+            ],
+            'ticketListingConfig' => [
+                'entityClassName' => Ticket::class,
+                'ticketsListingProps' => [
+                    'exposeSearch' => false,
+                    'params' => ['project' => $project->getId()],
                 ],
             ],
         ]);

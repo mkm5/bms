@@ -9,7 +9,7 @@
 {%- endmacro _checkbox -%}
 
 {%- macro _label(classes='') -%}
-    {%- set base = 'font-sans antialiased text-sm text-stone-800 font-semibold required select-none' -%}
+    {%- set base = 'font-sans antialiased text-sm text-stone-800 font-semibold select-none' -%}
     {{ (base ~ ' ' ~ classes)|tailwind_merge }}
 {%- endmacro _label -%}
 

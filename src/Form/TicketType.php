@@ -2,8 +2,10 @@
 
 namespace App\Form;
 
+use App\Entity\Project;
 use App\Entity\Ticket;
 use App\Entity\TicketStatus;
+use App\Form\Autocomplete\ProjectAutocompleteField;
 use App\Form\Autocomplete\TagAutocompleteField;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -12,6 +14,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class TicketType extends AbstractType
 {
@@ -23,10 +26,18 @@ class TicketType extends AbstractType
             ])
             ->add('description', TextareaType::class, [
                 'empty_data' => '',
-                'attr' => [
-                    'rows' => 10,
-                ],
+                'attr' => ['rows' => 8],
                 'required' => false,
+            ])
+            ->add('project', ProjectAutocompleteField::class, [
+                'required' => true,
+                'multiple' => false,
+                'constraints' => [
+                    new Assert\Expression(
+                        'value === null or not value.isFinished()',
+                        'Project must not be finished',
+                    ),
+                ],
             ])
             ->add('status', EntityType::class, [
                 'class' => TicketStatus::class,
@@ -46,8 +57,6 @@ class TicketType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
-            'data_class' => Ticket::class,
-        ]);
+        $resolver->setDefaults(['data_class' => Ticket::class]);
     }
 }

@@ -19,15 +19,14 @@ class TicketTaskType extends AbstractType
                 'required' => false,
             ])
             ->add('description', TextType::class, [
-                'label' => false
+                'label' => false,
+                'attr' => ['placeholder' => 'Task description...'],
             ])
         ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
-            'data_class' => TicketTask::class,
-        ]);
+        $resolver->setDefaults(['data_class' => TicketTask::class]);
     }
 }

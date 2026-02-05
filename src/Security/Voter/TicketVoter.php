@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Security\Voter;
 
@@ -13,10 +13,13 @@ use Symfony\Component\Security\Core\User\UserInterface;
 final class TicketVoter extends Voter
 {
     public const EDIT = 'TICKET_EDIT';
+    public const ARCHIVE = 'TICKET_ARCHIVE';
+
+    private const SUPPORTED_ATTRIBUTES = [self::EDIT, self::ARCHIVE];
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        return in_array($attribute, [self::EDIT]) && $subject instanceof Ticket;
+        return in_array($attribute, self::SUPPORTED_ATTRIBUTES) && $subject instanceof Ticket;
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token, ?Vote $vote = null): bool
@@ -31,16 +34,18 @@ final class TicketVoter extends Voter
 
         return match($attribute) {
             self::EDIT => $this->canEdit($ticket, $user),
+            self::ARCHIVE => $this->canArchive($ticket, $user),
             default => throw new LogicException('Should never be reached'),
         };
     }
 
     private function canEdit(Ticket $ticket, User $user): bool
     {
-        if ($ticket->isArchived() || $ticket->getProject()->isFinished()) {
-            return false;
-        }
+        return $ticket->isEditable();
+    }
 
-        return true;
+    private function canArchive(Ticket $ticket, User $user): bool
+    {
+        return !$ticket->isArchived() || !$ticket->getProject()->isFinished();
     }
 }

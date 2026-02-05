@@ -9,9 +9,7 @@
             <div class="grid grid-cols-2 gap-6">
                 <div>
                     <h3 class="text-sm font-medium text-gray-500 mb-1">Status</h3>
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                        {{ viewTicket.status.name }}
-                    </span>
+                    <twig:Elements:Pill content="{{ viewTicket.status.name }}"/>
                 </div>
 
                 <div>
@@ -19,9 +17,7 @@
                     {% if viewTicket.tags|length > 0 %}
                         <div class="flex flex-wrap gap-2">
                             {% for tag in viewTicket.tags %}
-                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
-                                    {{ tag.name }}
-                                </span>
+                                <twig:Elements:Pill content="{{ tag.name }}"/>
                             {% endfor %}
                         </div>
                     {% else %}
@@ -51,15 +47,15 @@
                                     data-action="live#action"
                                     data-live-action-param="debounce(300)|toggleTask"
                                     data-live-task-id-param="{{ task.id }}"
-                                    {%- if viewTicket.project.finished -%}disabled{%- endif -%}
+                                    {%- if not viewTicket.editable -%}disabled{%- endif -%}
                                 >
-                                    {% if task.isFinished %}
+                                    {% if task.finished %}
                                         <twig:ux:icon name="tabler:circle-check-filled" class="w-5 h-5 text-green-500" />
                                     {% else %}
                                         <twig:ux:icon name="tabler:circle" class="w-5 h-5 text-gray-300 hover:text-gray-400" />
                                     {% endif %}
                                 </button>
-                                <span class="{{ task.isFinished ? 'text-gray-500 line-through' : 'text-gray-900' }}">
+                                <span class="{{ task.finished ? 'text-gray-500 line-through' : 'text-gray-900' }}">
                                     {{ task.description }}
                                 </span>
                             </div>
@@ -70,7 +66,7 @@
                 {% endif %}
             </div>
 
-            {%- if not viewTicket.project.finished -%}
+            {%- if viewTicket.editable -%}
             <div class="flex justify-end pt-4 border-t border-gray-200">
                 <twig:Elements:Button
                     data-action="live#emit"
@@ -83,19 +79,12 @@
             {%- endif -%}
         </div>
     {% elseif status == 'edit' %}
-        {{ form_start(form, {
-            attr: {
-                'data-action': 'live#action:prevent',
-                'data-live-action-param': 'save'
-            }
-        }) }}
+        {{ form_start(form, {attr: {'data-action': 'live#action:prevent', 'data-live-action-param': 'save'}}) }}
             {% do form.tasks.setRendered %}
-
             {{ form_row(form.title) }}
             {{ form_row(form.description) }}
-
+            {{ form_row(form.project) }}
             {{ form_row(form.status) }}
-
             <div>
                 <div class="flex items-center justify-between mb-1">
                     {{ form_label(form.tags) }}
@@ -132,7 +121,7 @@
                             <div class="flex items-center gap-3 p-2 bg-gray-50 rounded-lg group">
                                 {{ form_widget(taskForm.isFinished, {attr: {class: 'w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500'}}) }}
                                 <div class="flex-1">
-                                    {{ form_widget(taskForm.description, {attr: {class: 'w-full border-0 bg-transparent p-0 text-gray-900 placeholder:text-gray-400 focus:ring-0 text-sm', placeholder: 'Task description...'}}) }}
+                                    {{ form_widget(taskForm.description, {attr: {class: 'w-full border-0 bg-transparent p-0 text-gray-900 placeholder:text-gray-400 focus:ring-0 text-sm'}}) }}
                                 </div>
                                 <button
                                     type="button"

@@ -30,6 +30,9 @@ final class ProjectView extends AbstractController
     #[LiveProp]
     public array $formListingConfig;
 
+    #[LiveProp]
+    public array $ticketListingConfig;
+
     public function __construct(
         private readonly ProjectRepository $projectRepository,
         private readonly DocumentRepository $documentRepository,
