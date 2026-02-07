@@ -22,7 +22,10 @@
         </twig:Elements:Td>
         {%- if not this.hasParam('project') -%}
         <twig:Elements:Td>
-            <twig:Elements:Pill variant="blue" content="{{ item.form.project.name }}"/>
+            <a
+                href="{{ path('app_user_project_view', {id: item.form.project.id}) }}"
+                class="text-gray-500 hover:text-gray-900 hover:underline"
+            >{{ item.form.project.name }}</a>
         </twig:Elements:Td>
         {%- endif -%}
         <twig:Elements:Td>
