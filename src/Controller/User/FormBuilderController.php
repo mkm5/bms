@@ -8,10 +8,12 @@ use App\Entity\FormSubmission;
 use App\ValueResolver\FormStatusFromNameResolver;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\ValueResolver;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 
 final class FormBuilderController extends AbstractController
 {
@@ -77,5 +79,23 @@ final class FormBuilderController extends AbstractController
         $em->flush();
 
         return $this->redirectToRoute('app_user_forms');
+    }
+
+    #[Route('/forms/{id}/delete', name: 'app_user_form_delete', methods: 'POST')]
+    #[IsCsrfTokenValid(new Expression('"delete-form-" ~ args["formDefinition"].getId()'))]
+    public function delete(FormDefinition $formDefinition, EntityManagerInterface $em): Response
+    {
+        $em->remove($formDefinition);
+        $em->flush();
+        return $this->redirectToRoute('app_user_forms');
+    }
+
+    #[Route('/forms/{form}/submissions/{submission}/delete', name: 'app_user_form_submission_delete', methods: 'POST')]
+    #[IsCsrfTokenValid(new Expression('"delete-submission-" ~ args["submission"].getId()'))]
+    public function deleteSubmission(FormDefinition $form, FormSubmission $submission, EntityManagerInterface $em): Response
+    {
+        $em->remove($submission);
+        $em->flush();
+        return $this->redirectToRoute('app_user_form_submissions', ['id' => $form->getId()]);
     }
 }

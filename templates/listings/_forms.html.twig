@@ -36,60 +36,70 @@
         <twig:Elements:Td>{{ item.fields }}</twig:Elements:Td>
         <twig:Elements:Td>{{ item.submissions }} </twig:Elements:Td>
         <twig:Elements:Td class="text-gray-900 whitespace-nowrap text-right">
-            {%- set formStatusEnum = enum('App\\Config\\FormStatus') -%}
+            <twig:Elements:Dropdown variant='short'>
+                {%- set formStatusEnum = enum('App\\Config\\FormStatus') -%}
 
-            {% if item.form.canEdit %}
-                <twig:Elements:Button
-                    variant="link"
-                    href="{{ path('app_user_form_builder_edit', {id: item.form.id}) }}"
-                >
-                    <twig:ux:icon name="tabler:pencil" class="w-4 h-4" /> Edit
-                </twig:Elements:Button>
-
-                <form
-                    class="inline"
-                    method="post"
-                    action="{{ path('app_user_form_status', {id: item.form.id, status: formStatusEnum.LIVE.name}) }}"
-                    onsubmit="return confirm('Publishing will make this form live and prevent further editing. Continue?')"
-                >
-                    <twig:Elements:Button type="submit" variant="link">
-                        <twig:ux:icon name="tabler:send" class="w-4 h-4" /> Publish
+                {% if item.form.canEdit %}
+                    <twig:Elements:Button
+                        variant="link"
+                        width="full"
+                        class="justify-start"
+                        href="{{ path('app_user_form_builder_edit', {id: item.form.id}) }}"
+                    >
+                        <twig:ux:icon name="tabler:pencil" class="w-4 h-4" /> Edit
                     </twig:Elements:Button>
-                </form>
-            {% endif %}
 
-            {% if item.form.canSubmit %}
-                <twig:Elements:Button
-                    variant="link"
-                    href="{{ path('app_form_show', {id: item.form.id}) }}"
-                >
-                    <twig:ux:icon name="tabler:forms" class="w-4 h-4" /> View
-                </twig:Elements:Button>
-            {% endif %}
+                    <form
+                        method="post"
+                        action="{{ path('app_user_form_status', {id: item.form.id, status: formStatusEnum.LIVE.name}) }}"
+                        onsubmit="return confirm('Publishing will make this form live and prevent further editing. Continue?')"
+                    >
+                        <twig:Elements:Button type="submit" class="justify-start" width="full" variant="link">
+                            <twig:ux:icon name="tabler:send" class="w-4 h-4" /> Publish
+                        </twig:Elements:Button>
+                    </form>
+                {% endif %}
 
-            {% if item.form.status == formStatusEnum.LIVE and not item.form.project.isFinished %}
-                <form
-                    class="inline"
-                    method="post"
-                    action="{{ path('app_user_form_status', {id: item.form.id, status: formStatusEnum.ARCHIVED.name}) }}"
-                >
-                    <twig:Elements:Button type="submit" variant="link">
-                        <twig:ux:icon name="tabler:archive" class="w-4 h-4" /> Archive
+                {% if item.form.canSubmit %}
+                    <twig:Elements:Button
+                        width="full"
+                        variant="link"
+                        class="justify-start"
+                        href="{{ path('app_form_show', {id: item.form.id}) }}"
+                    >
+                        <twig:ux:icon name="tabler:forms" class="w-4 h-4" /> View
                     </twig:Elements:Button>
-                </form>
-            {% endif %}
+                {% endif %}
 
-            {% if item.form.status == formStatusEnum.ARCHIVED and not item.form.project.isFinished %}
-                <form
-                    class="inline"
-                    method="post"
-                    action="{{ path('app_user_form_status', {id: item.form.id, status: formStatusEnum.LIVE.name}) }}"
-                >
-                    <twig:Elements:Button type="submit" variant="link">
-                        <twig:ux:icon name="tabler:archive-off" class="w-4 h-4" /> Unarchive
-                    </twig:Elements:Button>
-                </form>
-            {% endif %}
+                {% if item.form.status == formStatusEnum.LIVE and not item.form.project.isFinished %}
+                    <form
+                        method="post"
+                        action="{{ path('app_user_form_status', {id: item.form.id, status: formStatusEnum.ARCHIVED.name}) }}"
+                    >
+                        <twig:Elements:Button type="submit" class="justify-start" width="full" variant="link">
+                            <twig:ux:icon name="tabler:archive" class="w-4 h-4" /> Archive
+                        </twig:Elements:Button>
+                    </form>
+                {% endif %}
+
+                {% if item.form.status == formStatusEnum.ARCHIVED and not item.form.project.isFinished %}
+                    <form
+                        method="post"
+                        action="{{ path('app_user_form_status', {id: item.form.id, status: formStatusEnum.LIVE.name}) }}"
+                    >
+                        <twig:Elements:Button type="submit" class="justify-start" width="full" variant="link">
+                            <twig:ux:icon name="tabler:archive-off" class="w-4 h-4" /> Unarchive
+                        </twig:Elements:Button>
+                    </form>
+                {% endif %}
+
+                <twig:Elements:DeleteButton
+                    button:class="justify-start"
+                    button:width="full"
+                    action="{{ path('app_user_form_delete', {id: item.form.id}) }}"
+                    token="{{ csrf_token('delete-form-' ~ item.form.id) }}"
+                />
+            </twig:Elements:Dropdown>
         </twig:Elements:Td>
     </twig:block>
     <twig:block name="post_table">
