@@ -6,10 +6,10 @@ use App\Entity\Project;
 use App\Event\ProjectFinishedEvent;
 use App\Repository\DocumentRepository;
 use App\Repository\ProjectRepository;
+use App\Security\Voter\ProjectVoter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
@@ -51,9 +51,9 @@ final class ProjectView extends AbstractController
     }
 
     #[LiveAction]
-    #[IsGranted('ROLE_ADMIN')]
     public function toggleProjectStatus(): RedirectResponse
     {
+        $this->denyAccessUnlessGranted(ProjectVoter::FINISH, 'project');
         $this->project->setIsFinished(!$this->project->isFinished());
         if ($this->project->isFinished()) {
             $this->eventDispatcher->dispatch(new ProjectFinishedEvent($this->project));
@@ -67,6 +67,10 @@ final class ProjectView extends AbstractController
     #[LiveAction]
     public function removeDocument(#[LiveArg] int $documentId): void
     {
+        if ($this->project->isFinished()) {
+            throw $this->createAccessDeniedException('Cannot remove documents from a finished project.');
+        }
+
         $document = $this->documentRepository->find($documentId);
         if ($document) {
             $this->project->removeDocument($document);

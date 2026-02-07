@@ -5,6 +5,7 @@ namespace App\Twig\Components\User;
 use App\Entity\Project;
 use App\Form\ProjectType;
 use App\Repository\ProjectRepository;
+use App\Security\Voter\ProjectVoter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
@@ -44,6 +45,10 @@ final class ProjectEdit extends AbstractController
     #[LiveAction]
     public function save(): void
     {
+        if ($this->viewProject) {
+            $this->denyAccessUnlessGranted(ProjectVoter::EDIT, $this->viewProject);
+        }
+
         $this->submitForm();
 
         /** @var Project */
@@ -67,9 +72,13 @@ final class ProjectEdit extends AbstractController
             : $this->projectRepository->find($project)
         ;
 
-        if ($project && !$this->viewProject) {
-            throw new \ValueError('Project with id "'.($project).'" does not exist');
+        if ($project) {
+            if (!$this->viewProject) {
+                throw $this->createNotFoundException('Project with id "'.($project).'" does not exist');
+            }
+            $this->denyAccessUnlessGranted(ProjectVoter::EDIT, $this->viewProject);
         }
+
 
         $this->dispatchBrowserEvent('modal:open', ['id' => $this->modalName]);
         $this->resetForm();

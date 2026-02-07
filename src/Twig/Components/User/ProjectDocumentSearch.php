@@ -7,6 +7,7 @@ use App\Entity\Project;
 use App\Repository\DocumentRepository;
 use App\Repository\ProjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use LogicException;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveArg;
@@ -50,6 +51,10 @@ final class ProjectDocumentSearch
     {
         if (!$this->project) {
             return;
+        }
+
+        if ($this->project->isFinished()) {
+            throw new LogicException('Cannot add documents to a finished project.');
         }
 
         $document = $this->documentRepository->find($documentId);

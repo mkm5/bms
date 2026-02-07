@@ -10,13 +10,15 @@
             <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
                 <h2 class="text-lg font-semibold text-gray-900">Project Details</h2>
                 <div class="flex items-center gap-2">
-                    <twig:Elements:Button
-                        data-action="live#emit"
-                        data-live-event-param="project:edit"
-                        data-live-project-param="{{ project.id }}"
-                    >
-                        <twig:ux:icon name="tabler:pencil" class="mr-2" />Edit
-                    </twig:Elements:Button>
+                    {% if is_granted('PROJECT_EDIT', project) %}
+                        <twig:Elements:Button
+                            data-action="live#emit"
+                            data-live-event-param="project:edit"
+                            data-live-project-param="{{ project.id }}"
+                        >
+                            <twig:ux:icon name="tabler:pencil" class="mr-2" />Edit
+                        </twig:Elements:Button>
+                    {% endif %}
                     {% if is_granted('PROJECT_DELETE', project) %}
                         <twig:Elements:DeleteButton
                             button:size="md"
@@ -40,7 +42,7 @@
                 <div>
                     <div class="flex gap-4">
                         <h3 class="inline-block text-sm font-medium text-gray-500 mb-1">Status</h3>
-                        {%- if is_granted('ROLE_ADMIN') -%}
+                        {%- if is_granted('PROJECT_FINISH', project) -%}
                         <button
                             type="button"
                             data-action="live#action"
@@ -86,13 +88,15 @@
         <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
                 <h2 class="text-lg font-semibold text-gray-900">Documents</h2>
-                <twig:Elements:Button
-                    data-action="live#emit"
-                    data-live-event-param="project:assign-document"
-                    data-live-project-param="{{ project.id }}"
-                >
-                    <twig:ux:icon name="tabler:plus" class="mr-2" />Add Document
-                </twig:Elements:Button>
+                {% if not project.finished %}
+                    <twig:Elements:Button
+                        data-action="live#emit"
+                        data-live-event-param="project:assign-document"
+                        data-live-project-param="{{ project.id }}"
+                    >
+                        <twig:ux:icon name="tabler:plus" class="mr-2" />Add Document
+                    </twig:Elements:Button>
+                {% endif %}
             </div>
             <div class="p-6">
                 {% if project.documents|length > 0 %}
@@ -111,18 +115,20 @@
                                         {% endif %}
                                     </div>
                                 </div>
-                                <div class="ml-3 shrink-0">
-                                    <button
-                                        type="button"
-                                        class="inline-flex items-center justify-center w-8 h-8 rounded-full text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
-                                        data-action="live#action"
-                                        data-live-action-param="removeDocument"
-                                        data-live-document-id-param="{{ document.id }}"
-                                        title="Remove document"
-                                    >
-                                        <twig:ux:icon name="tabler:x" class="w-5 h-5" />
-                                    </button>
-                                </div>
+                                {% if not project.finished %}
+                                    <div class="ml-3 shrink-0">
+                                        <button
+                                            type="button"
+                                            class="inline-flex items-center justify-center w-8 h-8 rounded-full text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                                            data-action="live#action"
+                                            data-live-action-param="removeDocument"
+                                            data-live-document-id-param="{{ document.id }}"
+                                            title="Remove document"
+                                        >
+                                            <twig:ux:icon name="tabler:x" class="w-5 h-5" />
+                                        </button>
+                                    </div>
+                                {% endif %}
                             </div>
                         {% endfor %}
                     </div>
