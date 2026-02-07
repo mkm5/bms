@@ -3,9 +3,12 @@
 namespace App\Controller\User;
 
 use App\Entity\Document;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 
 final class DocumentController extends AbstractController
 {
@@ -24,5 +27,14 @@ final class DocumentController extends AbstractController
     public function view(Document $document): Response
     {
         return $this->render('user/document_view.html.twig', ['document' => $document]);
+    }
+
+    #[Route('/documents/{id}/delete', name: 'app_user_document_delete', methods: 'POST')]
+    #[IsCsrfTokenValid(new Expression('"delete-document-" ~ args["document"].getId()'))]
+    public function delete(Document $document, EntityManagerInterface $em): Response
+    {
+        $em->remove($document);
+        $em->flush();
+        return $this->redirectToRoute('app_user_documents');
     }
 }

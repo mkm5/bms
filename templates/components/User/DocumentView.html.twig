@@ -9,15 +9,21 @@
         <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
                 <h2 class="text-lg font-semibold text-gray-900">Document Details</h2>
-                <twig:Elements:Button
-                    variant="secondary"
-                    size="sm"
-                    data-action="live#emit"
-                    data-live-event-param="document:edit"
-                    data-live-document-param="{{ document.id }}"
-                >
-                    <twig:ux:icon name="tabler:edit" class="w-4 h-4 mr-1" /> Edit
-                </twig:Elements:Button>
+                <div class="flex items-center gap-2">
+                    <twig:Elements:Button
+                        variant="secondary"
+                        size="sm"
+                        data-action="live#emit"
+                        data-live-event-param="document:edit"
+                        data-live-document-param="{{ document.id }}"
+                    >
+                        <twig:ux:icon name="tabler:edit" class="w-4 h-4 mr-1" /> Edit
+                    </twig:Elements:Button>
+                    <twig:Elements:DeleteButton
+                        action="{{ path('app_user_document_delete', {id: document.id}) }}"
+                        token="{{ csrf_token('delete-document-' ~ document.id) }}"
+                    />
+                </div>
             </div>
             <div class="p-6 space-y-6">
                 <div>
