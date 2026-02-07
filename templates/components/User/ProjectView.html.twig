@@ -9,13 +9,22 @@
         <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
                 <h2 class="text-lg font-semibold text-gray-900">Project Details</h2>
-                <twig:Elements:Button
-                    data-action="live#emit"
-                    data-live-event-param="project:edit"
-                    data-live-project-param="{{ project.id }}"
-                >
-                    <twig:ux:icon name="tabler:pencil" class="mr-2" />Edit
-                </twig:Elements:Button>
+                <div class="flex items-center gap-2">
+                    <twig:Elements:Button
+                        data-action="live#emit"
+                        data-live-event-param="project:edit"
+                        data-live-project-param="{{ project.id }}"
+                    >
+                        <twig:ux:icon name="tabler:pencil" class="mr-2" />Edit
+                    </twig:Elements:Button>
+                    {% if is_granted('PROJECT_DELETE', project) %}
+                        <twig:Elements:DeleteButton
+                            button:size="md"
+                            action="{{ path('app_user_project_delete', {id: project.id}) }}"
+                            token="{{ csrf_token('delete-project-' ~ project.id) }}"
+                        />
+                    {% endif %}
+                </div>
             </div>
             <div class="p-6 space-y-6">
                 <div>

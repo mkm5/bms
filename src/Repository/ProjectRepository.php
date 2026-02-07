@@ -31,7 +31,7 @@ class ProjectRepository extends ServiceEntityRepository implements SearchableRep
         ;
 
         return $this->createQueryBuilder('p')
-            ->join('p.managers', 'm')
+            ->leftJoin('p.managers', 'm')
             ->addSelect('m')
             ->andWhere('p.id in (:ids)')
             ->setParameter('ids', $ids)

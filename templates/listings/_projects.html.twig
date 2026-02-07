@@ -37,28 +37,35 @@
         </twig:Elements:Td>
         <twig:Elements:Td class="text-gray-900 whitespace-nowrap text-right">
             <twig:Elements:Dropdown variant='short'>
-                <button
-                    type="button"
+                {%- if is_granted_for_user(app.user, 'PROJECT_EDIT', item) -%}
+                <twig:Elements:DropdownButton
                     data-action="live#emit"
                     data-live-event-param="project:edit"
                     data-live-project-param="{{ item.id }}"
-                    class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
                 >
                     <twig:ux:icon name="tabler:pencil" class="w-4 h-4" /> Edit
-                </button>
-                <button
-                    type="button"
+                </twig:Elements:DropdownButton>
+                {%- endif -%}
+
+                {%- if is_granted_for_user(app.user, 'PROJECT_FINISH', item) -%}
+                <twig:Elements:DropdownButton
                     data-action="live#action"
                     data-live-action-param="toggleProjectStatus"
                     data-live-project-param="{{ item.id }}"
-                    class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
                 >
-                    {% if item.isFinished %}
-                        <twig:ux:icon name="tabler:player-play" class="w-4 h-4" /> Mark as active
-                    {% else %}
-                        <twig:ux:icon name="tabler:check" class="w-4 h-4" /> Mark as finished
-                    {% endif %}
-                </button>
+                    <twig:ux:icon class="w-4 h-4" name="{{ item.finished ? 'tabler:player-play' : 'tabler:check' }}"/>
+                    {{  item.finished ? 'Mark as active' : 'Mark as finished'   -}}
+                </twig:Elements:DropdownButton>
+                {%- endif -%}
+
+                {%- if is_granted_for_user(app.user, 'PROJECT_DELETE', item) -%}
+                <twig:Elements:DeleteButton
+                    button:class="justify-start"
+                    button:width="full"
+                    action="{{ path('app_user_project_delete', {id: item.id}) }}"
+                    token="{{ csrf_token('delete-project-' ~ item.id) }}"
+                />
+                {%- endif -%}
             </twig:Elements:Dropdown>
         </twig:Elements:Td>
     </twig:block>
