@@ -2,7 +2,6 @@
 
 namespace App\Form;
 
-use App\Entity\Project;
 use App\Entity\Ticket;
 use App\Entity\TicketStatus;
 use App\Form\Autocomplete\ProjectAutocompleteField;
@@ -45,7 +44,9 @@ class TicketType extends AbstractType
                 // Happens locally, fetches all of the data
                 'autocomplete' => true,
             ])
-            ->add('tags', TagAutocompleteField::class)
+            ->add('tags', TagAutocompleteField::class, [
+                'required' => false,
+            ])
             ->add('tasks', CollectionType::class, [
                 'entry_type' => TicketTaskType::class,
                 'allow_add' => true,

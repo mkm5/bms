@@ -79,7 +79,7 @@ class Ticket
         return $this->id;
     }
 
-    public function getProject(): Project
+    public function getProject(): ?Project
     {
         return $this->project;
     }

@@ -3,7 +3,6 @@
 namespace App\Twig\Components\User;
 
 use App\Entity\Ticket;
-use App\Entity\TicketTask;
 use App\Form\TicketType;
 use App\Repository\TagRepository;
 use App\Repository\TicketRepository;
@@ -11,10 +10,7 @@ use App\Repository\TicketTaskRepository;
 use App\Security\Voter\TicketVoter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveArg;
@@ -60,7 +56,7 @@ final class TicketViewEdit extends AbstractController
     #[LiveAction]
     public function save(): void
     {
-        if ($this->viewTicket->getId()) {
+        if ($this->viewTicket?->getId()) {
             $this->denyAccessUnlessGranted(TicketVoter::EDIT, $this->viewTicket);
         }
 
@@ -87,11 +83,13 @@ final class TicketViewEdit extends AbstractController
             : $this->ticketRepository->find($ticket)
         ;
 
-        if ($ticket && !$this->viewTicket) {
-            throw new \ValueError('Ticket with id "'.($ticket).'" does not exist');
+        if ($ticket) {
+            if (!$this->viewTicket) {
+                throw new \ValueError('Ticket with id "'.($ticket).'" does not exist');
+            }
+            $this->denyAccessUnlessGranted(TicketVoter::EDIT, $this->viewTicket);
         }
 
-        $this->denyAccessUnlessGranted(TicketVoter::EDIT, $this->viewTicket);
         $this->dispatchBrowserEvent('modal:open', ['id' => $this->editModalName]);
         $this->resetForm();
     }

@@ -66,8 +66,13 @@
                 {% endif %}
             </div>
 
-            {%- if viewTicket.editable -%}
-            <div class="flex justify-end pt-4 border-t border-gray-200">
+            <div class="flex justify-between pt-4 border-t border-gray-200">
+                <twig:Elements:DeleteButton
+                    action="{{ path('app_user_ticket_delete', {id: viewTicket.id}) }}"
+                    token="{{ csrf_token('delete-ticket-' ~ viewTicket.id) }}"
+                />
+
+                {%- if viewTicket.editable -%}
                 <twig:Elements:Button
                     data-action="live#emit"
                     data-live-event-param="ticket:edit"
@@ -75,8 +80,8 @@
                 >
                     <twig:ux:icon name="tabler:pencil" class="mr-2" />Edit
                 </twig:Elements:Button>
+                {%- endif -%}
             </div>
-            {%- endif -%}
         </div>
     {% elseif status == 'edit' %}
         {{ form_start(form, {attr: {'data-action': 'live#action:prevent', 'data-live-action-param': 'save'}}) }}

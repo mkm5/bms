@@ -63,6 +63,13 @@
                         {% endif %}
                     </twig:Elements:DropdownButton>
                 {%- endif -%}
+
+                <twig:Elements:DeleteButton
+                    button:class="justify-start"
+                    button:width="full"
+                    action="{{ path('app_user_ticket_delete', {id: item.ticket.id}) }}"
+                    token="{{ csrf_token('delete-ticket-' ~ item.ticket.id) }}"
+                />
             </twig:Elements:Dropdown>
         </twig:Elements:Td>
     </twig:block>
