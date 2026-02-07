@@ -9,6 +9,7 @@ use App\Repository\ProjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
@@ -50,6 +51,7 @@ final class ProjectView extends AbstractController
     }
 
     #[LiveAction]
+    #[IsGranted('ROLE_ADMIN')]
     public function toggleProjectStatus(): RedirectResponse
     {
         $this->project->setIsFinished(!$this->project->isFinished());
