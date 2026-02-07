@@ -66,7 +66,7 @@
                     <twig:ux:icon name="tabler:pencil" class="w-4 h-4" /> Edit
                 </twig:Elements:DropdownButton>
 
-                {%- if not item.isRegistered -%}
+                {%- if not item.registered -%}
                     <twig:Elements:DropdownButton
                         data-action="live#emit"
                         data-live-event-param="user:resend-registration-link"
@@ -84,6 +84,15 @@
                         {%- set text = item.isActive ? 'Deactivate user' : 'Activate user' -%}
                         <twig:ux:icon name="{{ icon }}" class="w-4 h-4" /> {{ text }}
                     </twig:Elements:DropdownButton>
+                {%- endif -%}
+
+                {%- if is_granted('ROLE_ADMIN') and item.id != app.user.id -%}
+                <twig:Elements:DeleteButton
+                    button:class="justify-start"
+                    button:width="full"
+                    action="{{ path('app_admin_user_delete', {id: item.id}) }}"
+                    token="{{ csrf_token('delete-user-' ~ item.id) }}"
+                />
                 {%- endif -%}
             </twig:Elements:Dropdown>
         </twig:Elements:Td>

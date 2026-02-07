@@ -14,10 +14,8 @@
     </twig:block>
     <twig:block name="table_row">
         <twig:Elements:Td class="text-gray-500">{{ item.ticket.id }}</twig:Elements:Td>
-        <twig:Elements:Td class="text-gray-900">
-            <span class="{% if item.ticket.isArchived %}line-through{% endif %}">
-                {{ item.ticket.title }}
-            </span>
+        <twig:Elements:Td class="{{ item.ticket.archived ? 'line-through' : 'text-gray-900' }}">
+            {{ item.ticket.title }}
         </twig:Elements:Td>
         <twig:Elements:Td>
             <a
