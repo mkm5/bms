@@ -3,9 +3,12 @@
 namespace App\Controller\User;
 
 use App\Entity\Contact;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 
 final class ContactController extends AbstractController
 {
@@ -26,5 +29,14 @@ final class ContactController extends AbstractController
         return $this->render('user/contact_view.html.twig', [
             'contact' => $contact,
         ]);
+    }
+
+    #[Route('/contacts/{id}/delete', name: 'app_user_contact_delete', methods: 'POST')]
+    #[IsCsrfTokenValid(new Expression('"delete-contact-" ~ args["contact"].getId()'))]
+    public function delete(Contact $contact, EntityManagerInterface $em): Response
+    {
+        $em->remove($contact);
+        $em->flush();
+        return $this->redirectToRoute('app_user_contacts');
     }
 }

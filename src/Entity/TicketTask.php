@@ -21,7 +21,7 @@ class TicketTask
     private bool $isFinished = false;
 
     #[ORM\ManyToOne(inversedBy: 'tasks', cascade: ['persist'])]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Ticket $ticket = null;
 
     public static function create(Ticket $ticket, string $description, bool $isFinished = false): TicketTask

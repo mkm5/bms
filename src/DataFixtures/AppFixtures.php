@@ -90,7 +90,7 @@ class AppFixtures extends Fixture
         $contactElena = Contact::create('Elena', 'Rodriguez', $companyVortex)
             ->withEmail('elena.r@vortex-ind.com')
             ->withWorkPhone('+34 612 345 678')
-            ->withCommuncationChannel(CommunicationType::OTHER, 'Slack: @elena.rodriguez');
+            ->withCommunicationChannel(CommunicationType::OTHER, 'Slack: @elena.rodriguez');
         $manager->persist($contactElena);
 
         $contactTomasz = Contact::create('Tomasz', 'Kowalski', $companyAcme)

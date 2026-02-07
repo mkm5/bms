@@ -62,14 +62,14 @@ final class ContactEdit extends AbstractController
     #[LiveAction]
     public function addChannel(): void
     {
-        $this->formValues['communcationChannels'][] = [];
+        $this->formValues['communicationChannels'][] = [];
     }
 
     #[LiveAction]
     public function removeChannel(#[LiveArg] int $index): void
     {
-        unset($this->formValues['communcationChannels'][$index]);
-        $this->formValues['communcationChannels'] = array_values($this->formValues['communcationChannels']);
+        unset($this->formValues['communicationChannels'][$index]);
+        $this->formValues['communicationChannels'] = array_values($this->formValues['communicationChannels']);
     }
 
     #[LiveListener('contact:edit')]

@@ -21,7 +21,7 @@ class CommunicationChannel
     #[ORM\Column(length: 255)]
     private ?string $value = null;
 
-    #[ORM\ManyToOne(inversedBy: 'communcationChannels')]
+    #[ORM\ManyToOne(inversedBy: 'communicationChannels')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Contact $contact = null;
 
@@ -32,7 +32,7 @@ class CommunicationChannel
     ): CommunicationChannel
     {
         if (empty(trim($value))) {
-            throw new InvalidArgumentException('Communcation channel must have value');
+            throw new InvalidArgumentException('Communication channel must have value');
         }
 
         return (new self)

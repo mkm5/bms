@@ -9,13 +9,19 @@
         <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
                 <h2 class="text-lg font-semibold text-gray-900">Contact Details</h2>
-                <twig:Elements:Button
-                    data-action="live#emit"
-                    data-live-event-param="contact:edit"
-                    data-live-contact-param="{{ contact.id }}"
-                >
-                    <twig:ux:icon name="tabler:pencil" class="mr-2" /> Edit
-                </twig:Elements:Button>
+                <div class="flex items-center gap-2">
+                    <twig:Elements:Button
+                        data-action="live#emit"
+                        data-live-event-param="contact:edit"
+                        data-live-contact-param="{{ contact.id }}"
+                    >
+                        <twig:ux:icon name="tabler:pencil" class="mr-2" /> Edit
+                    </twig:Elements:Button>
+                    <twig:Elements:DeleteButton
+                        action="{{ path('app_user_contact_delete', {id: contact.id}) }}"
+                        token="{{ csrf_token('delete-contact-' ~ contact.id) }}"
+                    />
+                </div>
             </div>
             <div class="p-6 space-y-6">
                 <div class="grid grid-cols-2 gap-6">
@@ -60,9 +66,9 @@
 
                 <div>
                     <h3 class="text-sm font-medium text-gray-500 mb-2">Communication Channels</h3>
-                    {% if contact.communcationChannels|length > 0 %}
+                    {% if contact.communicationChannels|length > 0 %}
                         <div class="space-y-2">
-                            {% for channel in contact.communcationChannels %}
+                            {% for channel in contact.communicationChannels %}
                                 <div class="flex items-center gap-3">
                                     <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 min-w-24">
                                         {% if channel.type.value == 'email' %}

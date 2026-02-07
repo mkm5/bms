@@ -1,0 +1,16 @@
+{%- props tokenName = '_token', token = null %}
+<form {{ attributes.defaults({method: 'POST'}) }}>
+    {%- if token is not empty -%}
+    <input type="hidden" name="{{ tokenName }}" value="{{ token }}">
+    {%- endif -%}
+    <twig:Elements:Button
+        variant="danger"
+        type="submit"
+        data-confirmation-handler-target="action"
+        data-confirmation-enabled="true"
+        data-confirmation-message="This action is permanent. Proceed?"
+        {{ ...attributes.nested('button') }}
+    >
+        <twig:ux:icon name="tabler:trash" class="mr-2" /> Delete
+    </twig:Elements:Button>
+</form>

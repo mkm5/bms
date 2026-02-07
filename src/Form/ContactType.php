@@ -39,7 +39,7 @@ class ContactType extends AbstractType
                     'rows' => 3,
                 ],
             ])
-            ->add('communcationChannels', CollectionType::class, [
+            ->add('communicationChannels', CollectionType::class, [
                 'entry_type' => CommunicationChannelType::class,
                 'entry_options' => ['label' => false],
                 'allow_add' => true,

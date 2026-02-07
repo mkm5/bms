@@ -39,6 +39,12 @@
                 >
                     <twig:ux:icon name="tabler:pencil" class="w-4 h-4" /> Edit
                 </button>
+                <twig:Elements:DeleteButton
+                    button:class="justify-start"
+                    button:width="full"
+                    action="{{ path('app_user_contact_delete', {id: item.id}) }}"
+                    token="{{ csrf_token('delete-contact-' ~ item.id) }}"
+                />
             </twig:Elements:Dropdown>
         </twig:Elements:Td>
     </twig:block>

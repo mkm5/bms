@@ -32,14 +32,15 @@ class Contact
 
     /** @var Collection<int, CommunicationChannel> */
     #[ORM\OneToMany(targetEntity: CommunicationChannel::class, mappedBy: 'contact', cascade: ['persist'], orphanRemoval: true)]
-    private Collection $communcationChannels;
+    private Collection $communicationChannels;
 
     #[ORM\ManyToOne(inversedBy: 'contacts')]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?Company $company = null;
 
     public function __construct()
     {
-        $this->communcationChannels = new ArrayCollection();
+        $this->communicationChannels = new ArrayCollection();
     }
 
     public static function create(
@@ -109,49 +110,49 @@ class Contact
     }
 
     /** @return Collection<int, CommunicationChannel> */
-    public function getCommuncationChannels(): Collection
+    public function getCommunicationChannels(): Collection
     {
-        return $this->communcationChannels;
+        return $this->communicationChannels;
     }
 
-    public function addCommuncationChannel(CommunicationChannel $communcationChannel): self
+    public function addCommunicationChannel(CommunicationChannel $communicationChannels): self
     {
-        if (!$this->communcationChannels->contains($communcationChannel)) {
-            $this->communcationChannels->add($communcationChannel);
-            $communcationChannel->setContact($this);
+        if (!$this->communicationChannels->contains($communicationChannels)) {
+            $this->communicationChannels->add($communicationChannels);
+            $communicationChannels->setContact($this);
         }
         return $this;
     }
 
-    public function removeCommuncationChannel(CommunicationChannel $communcationChannel): self
+    public function removeCommunicationChannel(CommunicationChannel $communicationChannels): self
     {
-        if ($this->communcationChannels->removeElement($communcationChannel)) {
+        if ($this->communicationChannels->removeElement($communicationChannels)) {
             // set the owning side to null (unless already changed)
-            if ($communcationChannel->getContact() === $this) {
-                $communcationChannel->setContact(null);
+            if ($communicationChannels->getContact() === $this) {
+                $communicationChannels->setContact(null);
             }
         }
         return $this;
     }
 
-    public function withCommuncationChannel(CommunicationType $type, string $value): self
+    public function withCommunicationChannel(CommunicationType $type, string $value): self
     {
-        return $this->addCommuncationChannel(CommunicationChannel::create($type, $value, $this));
+        return $this->addCommunicationChannel(CommunicationChannel::create($type, $value, $this));
     }
 
     public function withEmail(string $email): self
     {
-        return $this->withCommuncationChannel(CommunicationType::EMAIL, $email);
+        return $this->withCommunicationChannel(CommunicationType::EMAIL, $email);
     }
 
     public function withWorkPhone(string $phone): self
     {
-        return $this->withCommuncationChannel(CommunicationType::PHONE_WORK, $phone);
+        return $this->withCommunicationChannel(CommunicationType::PHONE_WORK, $phone);
     }
 
     public function withPersonalPhone(string $phone): self
     {
-        return $this->withCommuncationChannel(CommunicationType::PHONE_PERSONAL, $phone);
+        return $this->withCommunicationChannel(CommunicationType::PHONE_PERSONAL, $phone);
     }
 
     public function communicationChannelsByType(CommunicationType|string $type): array
@@ -160,7 +161,7 @@ class Contact
             $type = CommunicationType::from($type);
         }
 
-        return $this->communcationChannels
+        return $this->communicationChannels
             ->filter(fn(CommunicationChannel $cc) => $cc->getType() === $type)
             ->toArray()
         ;
