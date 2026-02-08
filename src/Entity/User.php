@@ -247,7 +247,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function isRegistered(): bool
     {
-        return !empty($self->password) && $self->status !== UserStatus::PENDING;
+        return !empty($this->password) && $this->status !== UserStatus::PENDING;
     }
 
     public function getLastLogin(): ?DateTimeImmutable

@@ -133,12 +133,6 @@ final class FormBuilder extends AbstractController
     }
 
     #[LiveAction]
-    public function updateRangeOption(#[LiveArg] int $fieldIndex, #[LiveArg] string $option, #[LiveArg] int $value): void
-    {
-        $this->fieldOptions[$fieldIndex][$option] = $value;
-    }
-
-    #[LiveAction]
     public function save(): RedirectResponse
     {
         if ($this->formDefinition->getId() && !$this->formDefinition->canEdit()) {

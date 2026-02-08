@@ -53,7 +53,7 @@ final class ProjectView extends AbstractController
     #[LiveAction]
     public function toggleProjectStatus(): RedirectResponse
     {
-        $this->denyAccessUnlessGranted(ProjectVoter::FINISH, 'project');
+        $this->denyAccessUnlessGranted(ProjectVoter::FINISH, $this->project);
         $this->project->setIsFinished(!$this->project->isFinished());
         if ($this->project->isFinished()) {
             $this->eventDispatcher->dispatch(new ProjectFinishedEvent($this->project));

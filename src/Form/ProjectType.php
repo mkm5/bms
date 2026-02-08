@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Project;
+use App\Form\Autocomplete\CompanyAutocompleteField;
 use App\Form\Autocomplete\UserAutocompleteField;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -25,6 +26,11 @@ class ProjectType extends AbstractType
                 'attr' => [
                     'rows' => 3,
                 ],
+            ])
+            ->add('companies', CompanyAutocompleteField::class, [
+                'label' => 'Companies',
+                'required' => false,
+                'multiple' => true,
             ])
             ->add('managers', UserAutocompleteField::class, [
                 'label' => 'Project Managers',
