@@ -18,6 +18,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+use ValueError;
 
 final readonly class FormDefinitionFormBuilder
 {
@@ -38,7 +40,15 @@ final readonly class FormDefinitionFormBuilder
     {
         $builder = $this->formFactory->createBuilder(FormType::class, $data, $options);
 
+        $labels = [];
+
         foreach ($definition->getFields() as $field) {
+            if (array_key_exists($field->getLabel(), $labels)) {
+                throw new ValueError('Non unique label found "'.$field->getLabel().'"');
+            }
+
+            $labels[$field->getLabel()] = true;
+
             $fieldType = $this->resolveFieldType($field->getType());
             $fieldOptions = $this->buildFieldOptions($field);
 
@@ -69,17 +79,23 @@ final readonly class FormDefinitionFormBuilder
         $options = [
             'label' => $field->getName(),
             'required' => $field->isRequired(),
+            'constraints' => [],
         ];
 
         if ($field->getHelpText()) {
             $options['help'] = $field->getHelpText();
         }
 
-        $fieldOptions = $field->getOptions() ?? [];
+        if ($field->isRequired()) {
+            $options['constraints'][] = new Assert\NotBlank();
+        }
+
+        $fieldOptions = $field->getOptions();
 
         match ($field->getType()) {
             FormFieldType::CHOICE => $this->configureChoiceOptions($options, $fieldOptions),
             FormFieldType::RANGE => $this->configureRangeOptions($options, $fieldOptions),
+            FormFieldType::EMAIL => $this->configureEmailOptions($options, $fieldOptions),
             FormFieldType::DATE, FormFieldType::TIME, FormFieldType::DATETIME => $options['widget'] = 'single_text',
             default => null,
         };
@@ -93,6 +109,10 @@ final readonly class FormDefinitionFormBuilder
         $options['choices'] = array_column($choices, 'value', 'label');
         $options['multiple'] = $fieldOptions['multiple'] ?? false;
         $options['expanded'] = $fieldOptions['expanded'] ?? false;
+
+        if (0 === count($choices)) {
+            throw new ValueError('Choices cannot be empty');
+        }
 
         $defaults = $fieldOptions['defaults'] ?? [];
         if (!empty($defaults) && !empty($choices)) {
@@ -119,6 +139,12 @@ final readonly class FormDefinitionFormBuilder
             'max' => $fieldOptions['max'] ?? self::RANGE_MAX,
             'step' => $fieldOptions['step'] ?? self::RANGE_STEP,
         ];
+        $options['constraints'][] = new Assert\Range(min: $options['attr']['min'], max: $options['attr']['max']);
+    }
+
+    private function configureEmailOptions(array &$options, array $fieldOptions): void
+    {
+        $options['constraints'][] = new Assert\Email(mode: Assert\Email::VALIDATION_MODE_HTML5_ALLOW_NO_TLD);
     }
 
     /**
