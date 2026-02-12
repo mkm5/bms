@@ -9,6 +9,9 @@
             'data-live-action-param': 'save'
         }
     }) }}
+
+        {{ form_errors(form) }}
+
         {# Form Definition Fields #}
         <div class="space-y-4 mb-8">
             {{ form_row(form.name) }}
@@ -31,6 +34,8 @@
                     <twig:ux:icon name="tabler:plus" class="w-4 h-4" /> Add Field
                 </button>
             </div>
+
+            {{ form_errors(form.fields) }}
 
             <div class="space-y-4">
                 {% for index, fieldForm in form.fields %}

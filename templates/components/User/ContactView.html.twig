@@ -57,12 +57,10 @@
                     {% endif %}
                 </div>
 
-                {%- if contact.note -%}
                 <div>
                     <h3 class="text-sm font-medium text-gray-500 mb-1">Note</h3>
-                    <p class="text-gray-900">{{ contact.note }}</p>
+                    <p class="text-gray-900 max-w-prose wrap-break-word">{{ contact.note ? contact.note|nl2br : '-' }}</p>
                 </div>
-                {%- endif -%}
 
                 <div>
                     <h3 class="text-sm font-medium text-gray-500 mb-2">Communication Channels</h3>

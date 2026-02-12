@@ -46,7 +46,7 @@ class Contact
     public static function create(
         string $firstName,
         string $lastName,
-        ?Company $company = null
+        Company $company,
     ): Contact
     {
         if (empty(trim($firstName)) || empty(trim($lastName))) {
@@ -185,7 +185,7 @@ class Contact
         return $this->company;
     }
 
-    public function setCompany(?Company $company): static
+    public function setCompany(?Company $company): self
     {
         $this->company = $company;
         return $this;

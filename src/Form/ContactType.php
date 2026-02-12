@@ -30,7 +30,7 @@ class ContactType extends AbstractType
             ])
             ->add('company', CompanyAutocompleteField::class, [
                 'label' => 'Company',
-                'required' => false,
+                'required' => true,
             ])
             ->add('note', TextareaType::class, [
                 'label' => 'Note',

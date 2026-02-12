@@ -31,15 +31,13 @@
         </twig:Elements:Td>
         <twig:Elements:Td class="text-gray-900 whitespace-nowrap text-right">
             <twig:Elements:Dropdown variant='short'>
-                <button
-                    type="button"
+                <twig:Elements:DropdownButton
                     data-action="live#emit"
                     data-live-event-param="contact:edit"
                     data-live-contact-param="{{ item.id }}"
-                    class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
                 >
                     <twig:ux:icon name="tabler:pencil" class="w-4 h-4" /> Edit
-                </button>
+                </twig:Elements:DropdownButton>
                 <twig:Elements:DeleteButton
                     button:class="justify-start"
                     button:width="full"
