@@ -6,7 +6,6 @@ use App\Entity\Ticket;
 use App\Entity\TicketStatus;
 use App\Repository\TicketRepository;
 use App\Repository\TicketStatusRepository;
-use RuntimeException;
 use ValueError;
 
 class TicketMover
@@ -44,7 +43,7 @@ class TicketMover
 
         $ticket->setDisplayOrder(0);
         $ticket->setStatus($status);
-        $ticketsInStatus = $status->getTickets();
+        $ticketsInStatus = $this->ticketRepository->findByStatusInDisplayOrder($status);
 
         $i = 0;
         $found = $precedingTicket === null ? true : false;
