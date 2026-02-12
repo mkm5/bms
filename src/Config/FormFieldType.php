@@ -2,7 +2,10 @@
 
 namespace App\Config;
 
-enum FormFieldType: string
+use Symfony\Contracts\Translation\TranslatableInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
+
+enum FormFieldType: string implements TranslatableInterface
 {
     case TEXT = 'text';
     case TEXTAREA = 'textarea';
@@ -15,36 +18,13 @@ enum FormFieldType: string
     case CHECKBOX = 'checkbox';
     case CHOICE = 'choice';
 
-    public function label(): string
-    {
-        return match ($this) {
-            self::TEXT => 'Text',
-            self::TEXTAREA => 'Textarea',
-            self::EMAIL => 'Email',
-            self::TELEPHONE => 'Telephone',
-            self::DATE => 'Date',
-            self::TIME => 'Time',
-            self::DATETIME => 'Date & Time',
-            self::RANGE => 'Range',
-            self::CHECKBOX => 'Checkbox',
-            self::CHOICE => 'Choice',
-        };
-    }
-
     public function hasChoices(): bool
     {
         return $this === self::CHOICE;
     }
 
-    public function isSimpleInput(): bool
+    public function trans(TranslatorInterface $translator, ?string $locale = null): string
     {
-        return in_array($this, [
-            self::TEXT,
-            self::EMAIL,
-            self::TELEPHONE,
-            self::DATE,
-            self::TIME,
-            self::DATETIME,
-        ], true);
+        return $translator->trans($this->name, domain: 'form_field_types', locale: $locale);
     }
 }

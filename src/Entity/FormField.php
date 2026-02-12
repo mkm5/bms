@@ -4,6 +4,9 @@ namespace App\Entity;
 
 use App\Config\FormFieldType;
 use App\Repository\FormFieldRepository;
+use DateTimeImmutable;
+use DateTimeInterface;
+use DateTimeZone;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -109,6 +112,11 @@ class FormField
         return $this;
     }
 
+    public function isType(FormFieldType $type): bool
+    {
+        return $this->type === $type;
+    }
+
     public function getType(): FormFieldType
     {
         return $this->type;
@@ -161,5 +169,22 @@ class FormField
         }
 
         $this->label = strtolower(trim(preg_replace('/[^a-zA-Z0-9]+/', '_', $this->name), '_'));
+    }
+
+    public function displayValue(mixed $value): ?string
+    {
+        return match($this->type) {
+            FormFieldType::CHECKBOX => $value ? 'Yes' : 'No',
+            FormFieldType::DATE => $this->valueToDateTime($value)->format('Y-m-d'),
+            FormFieldType::TIME => $this->valueToDateTime($value)->format('H:i'),
+            FormFieldType::DATETIME => $this->valueToDateTime($value)->format('Y-m-d H:i'),
+            default => $value === null
+                ? null : ((is_array($value)) ? implode(', ', $value) : (string)$value),
+        };
+    }
+
+    private function valueToDateTime(mixed $value): DateTimeImmutable
+    {
+        return new DateTimeImmutable($value['date'], new DateTimeZone($value['timezone']));
     }
 }

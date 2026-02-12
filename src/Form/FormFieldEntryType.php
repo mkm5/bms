@@ -33,15 +33,12 @@ class FormFieldEntryType extends AbstractType
             ->add('type', EnumType::class, [
                 'class' => FormFieldType::class,
                 'label' => 'Type',
-                'choice_label' => fn(FormFieldType $type) => $type->label(),
             ])
         ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
-            'data_class' => FormField::class,
-        ]);
+        $resolver->setDefaults(['data_class' => FormField::class]);
     }
 }

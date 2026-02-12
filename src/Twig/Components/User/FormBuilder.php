@@ -9,9 +9,11 @@ use App\Form\FormDefinitionType;
 use App\Service\FormDefinitionFormBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
@@ -149,8 +151,10 @@ final class FormBuilder extends AbstractController
             $field->setDisplayOrder($displayOrder++);
             $field->setOptions($this->getFieldOptions(
                 $field->getType(),
-                $this->fieldOptions[$index] ?? []
+                $this->fieldOptions[$index] ?? [],
             ));
+
+            $this->validateFieldOptions($this->getForm()->get('fields'), $field);
         }
 
         if (!$formDefinition->getId()) {
@@ -187,6 +191,18 @@ final class FormBuilder extends AbstractController
             ],
             default => [],
         };
+    }
+
+    private function validateFieldOptions(FormInterface $form, FormField $field): void
+    {
+        if ($field->isType(FormFieldType::CHOICE)) {
+            if (0 === count($field->getOptions()['choices'] ?? [])) {
+                $form->addError(new FormError('Choice type requires at least one choice'));
+                // HACK: https://github.com/symfony/ux/issues/1981#issuecomment-2845980320
+                $this->formView = null;
+                throw new UnprocessableEntityHttpException();
+            }
+        }
     }
 
     public function getPreviewForm(): ?FormView

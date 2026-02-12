@@ -13,13 +13,7 @@
     <twig:block name="table_row">
         <twig:Elements:Td>{{ item.id }}</twig:Elements:Td>
         {%- for field in this.fields -%}
-        <twig:Elements:Td>
-            {%- set value = item.data[field.label] ?? null -%}
-            {%- if value is null -%}-
-            {%- elseif value is iterable -%}{{ value|join(', ') }}
-            {%- else -%}{{ value }}
-            {%- endif -%}
-        </twig:Elements:Td>
+        <twig:Elements:Td>{{- field.displayValue(item.data[field.label] ?? null)  ?? '-' -}}</twig:Elements:Td>
         {%- endfor -%}
         <twig:Elements:Td>{{ item.submittedAt|date('Y-m-d H:i') }}</twig:Elements:Td>
         <twig:Elements:Td class="text-right">
