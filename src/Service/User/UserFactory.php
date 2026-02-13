@@ -24,6 +24,7 @@ final class UserFactory
         ?string $password = null,
         ?string $firstName = null,
         ?string $lastName = null,
+        ?string $position = null,
         bool $isAdmin = false,
         bool $isActive = false,
     ): User
@@ -39,16 +40,11 @@ final class UserFactory
             $user->setPassword($this->passwordHasher->hashPassword($user, $password));
         }
 
-        if (!empty($firstName)) {
-            $user->setFirstName($firstName);
-        }
-
-        if (!empty($lastName)) {
-            $user->setLastName($lastName);
-        }
+        if (!empty($firstName)) $user->setFirstName($firstName);
+        if (!empty($lastName)) $user->setLastName($lastName);
+        if (!empty($position)) $user->setPosition($position);
 
         $user->setRoles($isAdmin ? [User::ADMIN_ROLE, User::DEFAULT_ROLE] : [User::DEFAULT_ROLE]);
-
         $statusIfNotIsActive = empty($password) ? UserStatus::PENDING : UserStatus::DISABLED;
         $user->setStatus($isActive ? UserStatus::ACTIVE : $statusIfNotIsActive);
 
