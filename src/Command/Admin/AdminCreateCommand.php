@@ -28,14 +28,12 @@ class AdminCreateCommand extends Command
 
     protected function configure(): void
     {
-        $optionNegatableOptional = InputOption::VALUE_NEGATABLE | InputOption::VALUE_OPTIONAL;
-
         $this
             ->addArgument('email', InputArgument::OPTIONAL)
             ->addArgument('firstName', InputArgument::OPTIONAL)
             ->addArgument('lastName', InputArgument::OPTIONAL)
             ->addArgument('position', InputArgument::OPTIONAL)
-            ->addOption('active', null, $optionNegatableOptional, 'Marks user as active or inactive', true, [true, false])
+            ->addOption('active', null, InputOption::VALUE_NEGATABLE, 'Marks user as active or inactive', true)
         ;
     }
 
@@ -75,6 +73,8 @@ class AdminCreateCommand extends Command
 
         $this->em->persist($user);
         $this->em->flush();
+
+        $io->success('User created!');
 
         return Command::SUCCESS;
     }

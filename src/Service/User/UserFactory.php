@@ -8,6 +8,7 @@ use LogicException;
 use RuntimeException;
 use SensitiveParameter;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 final class UserFactory
@@ -50,9 +51,20 @@ final class UserFactory
 
         $errors = $this->validator->validate($user);
         if (count($errors) > 0) {
-            throw new RuntimeException('Validator errors: ' . (string)$errors);
+            throw new RuntimeException(join("\n", $this->flattenValidationErrors($errors)));
         }
 
         return $user;
+    }
+
+    private function flattenValidationErrors(ConstraintViolationListInterface $violations): array
+    {
+        $errors = [];
+        /** @var \Symfony\Component\Validator\ConstraintViolationInterface $violation */
+        foreach ($violations as $violation) {
+            $errors[] = $violation->getPropertyPath() . ' - ' . $violation->getMessage();
+        }
+
+        return $errors;
     }
 }
