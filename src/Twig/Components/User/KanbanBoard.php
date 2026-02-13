@@ -15,6 +15,7 @@ use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveArg;
 use Symfony\UX\LiveComponent\Attribute\LiveListener;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
+use ValueError;
 
 #[AsLiveComponent]
 final class KanbanBoard extends AbstractController
@@ -61,8 +62,17 @@ final class KanbanBoard extends AbstractController
         #[LiveArg] ?int $followingTicket,
     ): void
     {
-        $this->ticketMover->move($ticket, $targetStatus, $precedingTicket);
-        $this->em->flush();
+        try {
+            $this->ticketMover->move($ticket, $targetStatus, $precedingTicket);
+            $this->em->flush();
+        } catch (ValueError $e) {
+            $this->logger->warning('Error while moving ticket', [
+                'ticket' => $ticket,
+                'targetStatus' => $targetStatus,
+                'precedingTicket' => $precedingTicket,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     public function getModalName(): string

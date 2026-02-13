@@ -5,12 +5,15 @@ namespace App\Twig\Components\Admin;
 use App\DTO\TicketStatusWithTicketCount;
 use App\Entity\TicketStatus;
 use App\Repository\TicketStatusRepository;
+use App\Service\TicketStatusMover;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveArg;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
+use ValueError;
 
 #[AsLiveComponent]
 final class TicketStatusManager
@@ -23,6 +26,8 @@ final class TicketStatusManager
     public function __construct(
         private readonly TicketStatusRepository $ticketStatusRepository,
         private readonly EntityManagerInterface $em,
+        private readonly TicketStatusMover $ticketStatusMover,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -40,11 +45,7 @@ final class TicketStatusManager
             return;
         }
 
-        $maxOrder = $this->ticketStatusRepository
-            ->createQueryBuilder('ts')
-            ->select('MAX(ts.displayOrder)')
-            ->getQuery()
-            ->getSingleScalarResult();
+        $maxOrder = $this->ticketStatusRepository->maxDisplayOrder();
 
         $status = TicketStatus::create($name, ((int) $maxOrder) + 1);
         $this->em->persist($status);
@@ -68,37 +69,15 @@ final class TicketStatusManager
     #[LiveAction]
     public function reorder(#[LiveArg] int $statusId, #[LiveArg] ?int $precedingStatusId): void
     {
-        $statuses = $this->ticketStatusRepository->findAllInDisplayOrder();
-
-        $moved = null;
-        $remaining = [];
-        foreach ($statuses as $status) {
-
-            if ($status->getId() === $statusId) {
-                $moved = $status;
-                continue;
-            }
-            $remaining[] = $status;
+        try {
+            $this->ticketStatusMover->move($statusId, $precedingStatusId);
+            $this->em->flush();
+        } catch (ValueError $e) {
+            $this->logger->warning('Error while moving ticket status', [
+                'status' => $statusId,
+                'precedingStatus' => $precedingStatusId,
+                'error' => $e->getMessage(),
+            ]);
         }
-
-        if (!$moved) return;
-
-        $insertIndex = 0;
-
-        if ($precedingStatusId !== null) {
-            foreach ($remaining as $i => $status) {
-                if ($status->getId() === $precedingStatusId) {
-                    $insertIndex = $i + 1;
-                    break;
-                }
-            }
-        }
-
-        array_splice($remaining, $insertIndex, 0, [$moved]);
-        foreach ($remaining as $i => $status) {
-            $status->setDisplayOrder($i);
-        }
-
-        $this->em->flush();
     }
 }
