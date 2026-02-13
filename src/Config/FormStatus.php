@@ -16,7 +16,7 @@ enum FormStatus: int
             'draft' => self::DRAFT,
             'live' => self::LIVE,
             'archived' => self::ARCHIVED,
-            default => new ValueError('Unknown FormStatus name'),
+            default => throw new ValueError('Unknown FormStatus name'),
         };
     }
 }
