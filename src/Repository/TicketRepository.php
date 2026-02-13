@@ -26,10 +26,16 @@ class TicketRepository extends ServiceEntityRepository implements SearchableRepo
     /**
      * @return Ticket[]
      */
-    public function findByStatusInDisplayOrder(TicketStatus $status): array
+    public function findByStatusInDisplayOrder(TicketStatus $status, bool $includeArchived = false): array
     {
-        return $this->createQueryBuilder('t')
-            ->where('t.status = :status')
+        $qb = $this->createQueryBuilder('t');
+
+        if (!$includeArchived) {
+            $qb = $qb->andWhere('t.isArchived = false');
+        }
+
+        return $qb
+            ->andWhere('t.status = :status')
             ->setParameter('status', $status)
             ->orderBy('t.displayOrder', 'ASC')
             ->getQuery()
