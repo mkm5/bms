@@ -1,9 +1,10 @@
 FROM php:8.4-fpm
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends libfcgi-bin libicu-dev libpq-dev \
-    && docker-php-ext-install intl pdo_pgsql opcache \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends libfcgi-bin
+
+# PHP extensions
+ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+RUN install-php-extensions intl pdo_pgsql opcache zip
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
