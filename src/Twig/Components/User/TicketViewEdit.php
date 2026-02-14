@@ -154,7 +154,10 @@ final class TicketViewEdit extends AbstractController
     #[LiveListener('tag:created')]
     public function onTagCreated(#[LiveArg] int $tag): void
     {
-        $this->denyAccessUnlessGranted(TicketVoter::EDIT, $this->viewTicket);
+        if ($this->viewTicket->getId()) {
+            $this->denyAccessUnlessGranted(TicketVoter::EDIT, $this->viewTicket);
+        }
+
         if (!($tag = $this->tagRepository->find($tag))) {
             return;
         }
