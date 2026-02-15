@@ -34,7 +34,7 @@ class ContactRepository extends ServiceEntityRepository implements SearchableRep
         return (int)$this->buildSearchQuery($query, $params)
             ->select('COUNT(c.id)')
             ->getQuery()
-            ->getSingleColumnResult()
+            ->getSingleScalarResult()
         ;
     }
 

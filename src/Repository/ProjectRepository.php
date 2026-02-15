@@ -46,7 +46,7 @@ class ProjectRepository extends ServiceEntityRepository implements SearchableRep
         return (int) $this->buildSearchQuery($query, $params)
             ->select('COUNT(p.id)')
             ->getQuery()
-            ->getSingleColumnResult()
+            ->getSingleScalarResult()
         ;
     }
 
